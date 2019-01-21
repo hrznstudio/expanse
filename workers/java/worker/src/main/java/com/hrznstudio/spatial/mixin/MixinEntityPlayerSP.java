@@ -1,5 +1,18 @@
 package com.hrznstudio.spatial.mixin;
 
+import com.hrznstudio.spatial.SpatialMod;
+import improbable.Coordinates;
+import improbable.Position;
+import improbable.worker.Entity;
+import minecraft.entity.Player;
+import minecraft.entity.Rotation;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.util.math.AxisAlignedBB;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
 @Mixin(EntityPlayerSP.class)
 public class MixinEntityPlayerSP {
 
