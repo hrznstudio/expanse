@@ -1,0 +1,74 @@
+{
+  "tasks": [
+    {
+      "name": "Codegen",
+      "steps": [
+        {
+          "name": "Dependencies",
+          "arguments": [
+            "worker_package",
+            "unpack"
+          ]
+        },
+        {
+          "name": "Java",
+          "arguments": [
+            "process_schema",
+            "generate",
+            "--output=worker-sdk/generated",
+            "--language=java"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Build",
+      "steps": [
+        {
+          "name": "Codegen",
+          "arguments": [
+            "invoke-task",
+            "Codegen"
+          ]
+        },
+        {
+          "name": "Gradle",
+          "command": "gradle",
+          "arguments": [
+            "jar",
+            "linux_assembly",
+            "windows_assembly",
+            "macOS_assembly"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Clean",
+      "steps": [
+        {
+          "name": "Gradle",
+          "command": "gradle",
+          "arguments": [
+            "clean"
+          ]
+        },
+        {
+          "name": "Generated code",
+          "arguments": [
+            "process_schema",
+            "clean",
+            "worker-sdk/generated"
+          ]
+        },
+        {
+          "name": "Dependencies",
+          "arguments": [
+            "worker_package",
+            "clean"
+          ]
+        }
+      ]
+    }
+  ]
+}

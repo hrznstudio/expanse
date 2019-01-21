@@ -1,0 +1,46 @@
+apply plugin: 'java'
+repositories {
+    maven { url 'http://repo.maven.apache.org/maven2' }
+    maven {
+        url 'https://repo.spongepowered.org/maven/'
+    }
+}
+
+dependencies {
+    compile project(':worker')
+    compile project(':worker-sdk')
+}
+
+def mainClass = gradle.ext.mainClass
+
+jar {
+    baseName = rootProject.name
+    // Below instructs the jar plugin to build a jar from all the sources, recursively including the directories
+    // (via zipTree). This yields a self-contained jar with all dependencies included within.
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest {
+        attributes 'Main-Class': mainClass
+    }
+}
+
+task linux_assembly(type: Exec, dependsOn: 'jar') {
+    executable 'spatial'
+    args('file', 'zip', '--basePath=build/libs', '--output=../../build/assembly/worker/' + rootProject.name,
+            '--worker_platform=linux', '--log_level=debug', rootProject.name + '.jar')
+}
+
+task windows_assembly(type: Exec, dependsOn: 'jar') {
+    executable 'spatial'
+    args('file', 'zip', '--basePath=build/libs', '--output=../../build/assembly/worker/' + rootProject.name,
+            '--worker_platform=windows', '--log_level=debug', rootProject.name + '.jar')
+}
+
+task macOS_assembly(type: Exec, dependsOn: 'jar') {
+    executable 'spatial'
+    args('file', 'zip', '--basePath=build/libs', '--output=../../build/assembly/worker/' + rootProject.name,
+            '--worker_platform=macos', '--log_level=debug', rootProject.name + '.jar')
+}

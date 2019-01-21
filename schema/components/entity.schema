@@ -1,0 +1,36 @@
+package minecraft.entity;
+
+component Health {
+  id = 1001;
+  int32 current = 1;
+  int32 max = 2;
+}
+
+component Food {
+  id = 1002;
+  int32 current = 1;
+  int32 max = 2;
+}
+
+
+component Experience {
+  id = 1003;
+  float xp = 1;
+}
+
+component Rotation {
+  id = 1004;
+  float yaw = 1;
+  float pitch = 2;
+}
+
+type GameProfile {
+  string uuid = 1;
+}
+
+component Player {
+  id = 1006;
+  GameProfile profile = 1;
+  bool sneaking = 2;
+  bool sprinting = 3;
+}

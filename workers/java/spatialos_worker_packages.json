@@ -1,0 +1,28 @@
+{
+  "targets": [
+    {
+      "path": "worker-sdk/dependencies/sdk/",
+      "type": "worker_sdk",
+      "packages": [
+        {
+          "name": "java"
+        }
+      ]
+    },
+    {
+      "path": "worker-sdk/dependencies/sdk-native/",
+      "type": "worker_sdk",
+      "packages": [
+        {
+          "name": "java_native-dynamic-x86_64-win32"
+        },
+        {
+          "name": "java_native-dynamic-x86_64-macos"
+        },
+        {
+          "name": "java_native-dynamic-x86_64-linux"
+        }
+      ]
+    }
+  ]
+}

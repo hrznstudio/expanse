@@ -1,0 +1,21 @@
+{
+    "template": "small",
+    "world": {
+      "chunkEdgeLengthMeters": 50,
+      "snapshots": {
+        "snapshotWritePeriodSeconds": 0
+      },
+      "dimensions": {
+        "xMeters": 1500,
+        "zMeters": 1500
+      }
+    },
+    "workers": [
+      {
+        "worker_type": "HorizonJavaWorker",
+        "permissions": [{
+          "all": {}
+        }]
+      }
+    ]
+  }

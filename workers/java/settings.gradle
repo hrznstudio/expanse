@@ -1,0 +1,5 @@
+include 'worker'
+include 'worker-sdk'
+
+rootProject.name = "HorizonJavaWorker"
+gradle.ext.mainClass = 'com.hrznstudio.spatial.Bootstrap'

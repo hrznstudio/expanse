@@ -1,0 +1,7 @@
+worker-sdk/
+.idea/
+.gradle/
+classes/
+build/
+worker/run/
+.spatialos/

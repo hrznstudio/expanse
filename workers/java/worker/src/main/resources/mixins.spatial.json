@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.7.4",
+  "package": "com.hrznstudio.spatial.mixin",
+  "refmap": "mixins.spatial.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+
+  ],
+  "client": [
+    "MixinEntityPlayerSP"
+  ]
+}
