@@ -27,12 +27,12 @@ SpatialOS works differently: it brings together many servers so they’re workin
 - Spatial CLI [Windows](https://docs.improbable.io/reference/13.5/shared/get-started/setup/win) [MacOS](https://docs.improbable.io/reference/13.5/shared/get-started/setup/mac) [Linux](https://docs.improbable.io/reference/13.5/shared/get-started/setup/linux)
 
 ### Hardware Requirements
-|           | Minimum              | Recommended                              |   |   |
-|-----------|----------------------|------------------------------------------|---|---|
-| Processor | i5                   | i7                                       |   |   |
-| Memory    | 8GB                  | 16GB                                     |   |   |
-| Network   | X                    | High-speed broadband internet connection |   |   |
-| Storage   | 12GB available space | 12GB available space                     |   |   |
+|           | Minimum                           | Recommended                              |
+|-----------|-----------------------------------|------------------------------------------|
+| Processor | i5                                | i7                                       |
+| Memory    | 8GB                               | 16GB                                     |
+| Network   | Any broadband internet connection | High-speed broadband internet connection |
+| Storage   | 12GB available space              | 12GB available space                     |
 
 ### Set up environment
 
