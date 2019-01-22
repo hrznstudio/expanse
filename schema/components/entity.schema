@@ -1,4 +1,5 @@
 package minecraft.entity;
+import "improbable/standard_library.schema";
 
 component Health {
   id = 1001;
@@ -21,6 +22,11 @@ component Rotation {
   id = 1004;
   float yaw = 1;
   float pitch = 2;
+}
+
+component Motion {
+  id = 1005;
+  improbable.Coordinates coords = 1;
 }
 
 type GameProfile {

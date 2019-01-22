@@ -3,11 +3,9 @@ package com.hrznstudio.spatial.mixin;
 import com.hrznstudio.spatial.SpatialMod;
 import improbable.Coordinates;
 import improbable.Position;
-import improbable.worker.Entity;
-import improbable.worker.EntityId;
+import minecraft.entity.Motion;
 import minecraft.entity.Player;
 import minecraft.entity.Rotation;
-import minecraft.world.ChunkStorage;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,20 +45,25 @@ public class MixinEntityPlayerSP {
         if (SpatialMod.isConnectedToSpatial()) {
             boolean flag = playerSP.isSprinting();
 
-            if(SpatialMod.getPlayerId()==null) {
+            if (SpatialMod.getPlayerId() == null) {
                 return;
             }
 
+            boolean uSp = false, uSn = false;
+
             if (flag != serverSprintState) {
-//                player.get(Player.COMPONENT).get().setSprinting(flag);
+                uSp = true;
                 serverSprintState = flag;
             }
 
             boolean flag2 = playerSP.isSneaking();
 
             if (flag2 != serverSneakState) {
-//                player.get(Player.COMPONENT).get().setSneaking(flag);
+                uSn = true;
                 serverSneakState = flag2;
+            }
+            if (uSn || uSp) {
+                SpatialMod.connection.sendComponentUpdate(Player.COMPONENT, SpatialMod.getPlayerId(), new Player.Update().setSneaking(flag2).setSprinting(flag));
             }
 
             ++this.positionUpdateTicks;
@@ -82,10 +85,16 @@ public class MixinEntityPlayerSP {
             }
 
             if (rot) {
-//                player.update(Rotation.COMPONENT, new Rotation.Update().setPitch(playerSP.rotationPitch).setYaw(playerSP.rotationYaw));
+                SpatialMod.connection.sendComponentUpdate(Rotation.COMPONENT, SpatialMod.getPlayerId(), new Rotation.Update().setPitch(playerSP.rotationPitch).setYaw(playerSP.rotationYaw));
                 this.lastReportedYaw = playerSP.rotationYaw;
                 this.lastReportedPitch = playerSP.rotationPitch;
             }
+            SpatialMod.connection.sendComponentUpdate(Motion.COMPONENT, SpatialMod.getPlayerId(), new Motion.Update().setCoords(new Coordinates(
+                    playerSP.motionX,
+                    playerSP.motionY,
+                    playerSP.motionZ
+            )));
+
             this.positionUpdateTicks = 0;
         }
     }

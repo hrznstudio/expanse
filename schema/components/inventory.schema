@@ -1,16 +1,7 @@
 package minecraft.inventory;
-
-type Item {
-  string id = 1;
-}
-
-type ItemStack {
-  Item item = 1;
-  int32 count = 2;
-  int32 metadata = 3;
-}
+import "components/item.schema";
 
 component Inventory {
   id = 2001;
-  list<ItemStack> items = 1;
+  list<minecraft.item.ItemStack> items = 1;
 }

@@ -19,7 +19,7 @@ public class MixinPackageScanner {
     };
 
     /**
-     * @reason Reduce SpatialOS connection form 10 minutes to 3 seconds
+     * @reason Reduce SpatialOS connection from 10 minutes to 3 seconds
      * @author Coded
      */
     @Overwrite

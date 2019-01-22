@@ -1,0 +1,11 @@
+package minecraft.item;
+
+type Item {
+  string id = 1;
+}
+
+type ItemStack {
+  Item item = 1;
+  int32 count = 2;
+  int32 metadata = 3;
+}
