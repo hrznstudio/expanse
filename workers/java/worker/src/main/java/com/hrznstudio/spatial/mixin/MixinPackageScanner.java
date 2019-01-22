@@ -15,7 +15,7 @@ public class MixinPackageScanner {
 
     private static final String[] prefixes = new String[]{
             "improbable",
-            "your_base_component_package_here"
+            "minecraft"
     };
 
     /**
