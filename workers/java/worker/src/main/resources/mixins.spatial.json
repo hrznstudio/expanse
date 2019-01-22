@@ -9,6 +9,7 @@
 
   ],
   "client": [
-    "MixinEntityPlayerSP"
+    "MixinEntityPlayerSP",
+    "MixinPackageScanner"
   ]
 }

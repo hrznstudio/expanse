@@ -10,7 +10,6 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-
 version = "1.0"
 group = "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "modid"
@@ -41,9 +40,13 @@ repositories {
 }
 
 dependencies {
+    compile('org.reflections:reflections:0.9.11') {
+        transitive = false
+    }
     compile('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         transitive = false
     }
+    compile 'org.javassist:javassist:3.21.0-GA'
     compile project(':worker-sdk')
 }
 
