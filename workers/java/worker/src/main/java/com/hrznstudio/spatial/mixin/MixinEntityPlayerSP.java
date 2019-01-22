@@ -4,8 +4,10 @@ import com.hrznstudio.spatial.SpatialMod;
 import improbable.Coordinates;
 import improbable.Position;
 import improbable.worker.Entity;
+import improbable.worker.EntityId;
 import minecraft.entity.Player;
 import minecraft.entity.Rotation;
+import minecraft.world.ChunkStorage;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,22 +45,21 @@ public class MixinEntityPlayerSP {
     @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;onUpdateWalkingPlayer()V"))
     public void onUpdateWalkingPlayer(EntityPlayerSP playerSP) {
         if (SpatialMod.isConnectedToSpatial()) {
-
-            Entity player = SpatialMod.getPlayerEntity();
-            if(player==null)
-                return;
-
             boolean flag = playerSP.isSprinting();
 
+            if(SpatialMod.getPlayerId()==null) {
+                return;
+            }
+
             if (flag != serverSprintState) {
-                player.get(Player.COMPONENT).get().setSprinting(flag);
+//                player.get(Player.COMPONENT).get().setSprinting(flag);
                 serverSprintState = flag;
             }
 
             boolean flag2 = playerSP.isSneaking();
 
             if (flag2 != serverSneakState) {
-                player.get(Player.COMPONENT).get().setSneaking(flag);
+//                player.get(Player.COMPONENT).get().setSneaking(flag);
                 serverSneakState = flag2;
             }
 
@@ -69,11 +70,11 @@ public class MixinEntityPlayerSP {
             double d2 = playerSP.posZ - this.lastReportedPosZ;
             double d3 = (double) (playerSP.rotationYaw - this.lastReportedYaw);
             double d4 = (double) (playerSP.rotationPitch - this.lastReportedPitch);
-            boolean pos = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D; // || positionUpdateTicks >= 20;
+            boolean pos = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D;
             boolean rot = d3 != 0.0D || d4 != 0.0D;
 
             if (pos) {
-                player.update(Position.COMPONENT, new Position.Update().setCoords(new Coordinates(playerSP.posX, playerSP.posY, playerSP.posZ)));
+                SpatialMod.connection.sendComponentUpdate(Position.COMPONENT, SpatialMod.getPlayerId(), new Position.Update().setCoords(new Coordinates(playerSP.posX, playerSP.posY, playerSP.posZ)));
                 this.lastReportedPosX = playerSP.posX;
                 this.lastReportedPosY = axisalignedbb.minY;
                 this.lastReportedPosZ = playerSP.posZ;
@@ -81,7 +82,7 @@ public class MixinEntityPlayerSP {
             }
 
             if (rot) {
-                player.update(Rotation.COMPONENT, new Rotation.Update().setPitch(playerSP.rotationPitch).setYaw(playerSP.rotationYaw));
+//                player.update(Rotation.COMPONENT, new Rotation.Update().setPitch(playerSP.rotationPitch).setYaw(playerSP.rotationYaw));
                 this.lastReportedYaw = playerSP.rotationYaw;
                 this.lastReportedPitch = playerSP.rotationPitch;
             }

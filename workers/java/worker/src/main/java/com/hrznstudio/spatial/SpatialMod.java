@@ -21,13 +21,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class SpatialMod {
     static ScheduledThreadPoolExecutor asyncExecutor = new ScheduledThreadPoolExecutor(1);
     private static ScheduledFuture future;
-    private static Connection connection;
+    public static Connection connection;
     private static boolean isConnected;
     private static Dispatcher dispatcher;
-    private static Entity playerEntity;
+    private static EntityId playerId;
 
-    public static Entity getPlayerEntity() {
-        return playerEntity;
+    public static EntityId getPlayerId() {
+        return playerId;
     }
 
     public static boolean isConnectedToSpatial() {
@@ -50,13 +50,29 @@ public class SpatialMod {
 
         new Thread(SpatialMod::runEventLoop).start();
 
-        RequestId<CreateEntityRequest> requestId = connection.sendCreateEntityRequest(playerEntity = createPlayerEntity(), Option.empty(), Option.empty());
+        dispatcher.onCreateEntityResponse(new Callback<Ops.CreateEntityResponse>() {
+            @Override
+            public void call(Ops.CreateEntityResponse argument) {
+                if (argument.statusCode == StatusCode.SUCCESS) {
+                    playerId = argument.entityId.get();
+                }
+            }
+        });
+        dispatcher.onRemoveEntity(new Callback<Ops.RemoveEntity>() {
+            @Override
+            public void call(Ops.RemoveEntity argument) {
+                if(argument.entityId==playerId)
+                    connection.sendCreateEntityRequest(createPlayerEntity(), Option.empty(), Option.empty());
+            }
+        });
+        RequestId<CreateEntityRequest> requestId = connection.sendCreateEntityRequest(createPlayerEntity(), Option.empty(), Option.empty());
+
+
     }
 
 
     public static Entity createPlayerEntity() {
         EntityBuilder builder = new EntityBuilder("Player");
-
         builder.addComponent(
                 Position.COMPONENT,
                 new PositionData(new Coordinates(0, 0, 0)),
@@ -92,7 +108,7 @@ public class SpatialMod {
 
     private static Connection getConnection(String workerId, String hostname, int port) {
         ConnectionParameters parameters = new ConnectionParameters();
-        parameters.workerType = "HorizonJavaWorker";
+        parameters.workerType = "HorizonClientWorker";
         parameters.network = new NetworkParameters();
         parameters.network.connectionType = NetworkConnectionType.Tcp;
         parameters.network.useExternalIp = false;

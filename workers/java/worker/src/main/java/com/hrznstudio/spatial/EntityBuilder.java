@@ -3,6 +3,7 @@ package com.hrznstudio.spatial;
 import improbable.*;
 import improbable.worker.ComponentMetaclass;
 import improbable.worker.Entity;
+import improbable.worker.EntityId;
 
 import java.util.HashMap;
 import java.util.Map;

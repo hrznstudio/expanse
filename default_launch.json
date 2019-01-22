@@ -16,6 +16,12 @@
         "permissions": [{
           "all": {}
         }]
+      },
+      {
+        "worker_type": "HorizonClientWorker",
+        "permissions": [{
+          "all": {}
+        }]
       }
     ]
   }

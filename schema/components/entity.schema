@@ -12,7 +12,6 @@ component Food {
   int32 max = 2;
 }
 
-
 component Experience {
   id = 1003;
   float xp = 1;

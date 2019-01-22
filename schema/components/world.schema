@@ -1,0 +1,22 @@
+package minecraft.world;
+
+type Block {
+  string id = 1;
+}
+
+type State {
+  Block block = 1;
+  int32 meta = 2;
+}
+
+type ChunkList {
+  type InnerChunkList {
+    list<State> value = 1;
+  }
+  list<InnerChunkList> value = 1;
+}
+
+component ChunkStorage {
+  id = 3001;
+  list<ChunkList> list = 1;
+}
