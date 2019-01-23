@@ -14,7 +14,7 @@ public class ConnectionManager {
     private static boolean isConnected;
     private static Dispatcher dispatcher;
     private static EntityId playerId;
-    private static ConnectionStatus connectionStatus;
+    private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
 
     public static Connection getConnection() {
         return connection;
