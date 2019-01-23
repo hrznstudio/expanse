@@ -1,5 +1,9 @@
 package com.hrznstudio.spatial;
 
+import com.hrznstudio.spatial.client.ClientWorker;
+import com.hrznstudio.spatial.client.GuiConnecting;
+import com.hrznstudio.spatial.util.CommonWorkerRequirements;
+import com.hrznstudio.spatial.util.EntityBuilder;
 import improbable.Coordinates;
 import improbable.Position;
 import improbable.PositionData;
@@ -70,7 +74,12 @@ public class SpatialMod {
         );
         builder.addComponent(
                 Inventory.COMPONENT,
-                new InventoryData(Collections.emptyList()),
+                new InventoryData(Collections.emptyMap()),
+                CommonWorkerRequirements.getEntityWorkers()
+        );
+        builder.addComponent(
+                Flammable.COMPONENT,
+                new FlammableData(false),
                 CommonWorkerRequirements.getEntityWorkers()
         );
         return builder.build();

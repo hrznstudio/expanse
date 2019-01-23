@@ -3,5 +3,5 @@ import "components/item.schema";
 
 component Inventory {
   id = 2001;
-  list<minecraft.item.ItemStack> items = 1;
+  map<int32, minecraft.item.ItemStack> items = 1;
 }

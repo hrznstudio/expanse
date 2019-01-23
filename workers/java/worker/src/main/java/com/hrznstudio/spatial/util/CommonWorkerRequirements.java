@@ -1,4 +1,4 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.util;
 
 import com.google.common.collect.Lists;
 import improbable.WorkerAttributeSet;

@@ -40,6 +40,22 @@ component Player {
   bool sprinting = 3;
 }
 
+/**
+*/
 component ChatAbility {
   id = 1007;
+}
+
+type FlameRequest {
+  int32 time = 1;
+}
+
+type FlameResponse {
+  int32 time = 1;
+}
+
+component Flammable {
+  id = 1008;
+  bool on_fire = 1;
+  command FlameResponse setfire(FlameRequest);
 }

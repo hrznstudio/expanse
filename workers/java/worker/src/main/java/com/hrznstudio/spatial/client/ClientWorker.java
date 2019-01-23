@@ -1,4 +1,6 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.client;
+
+import com.hrznstudio.spatial.util.BaseWorker;
 
 public class ClientWorker extends BaseWorker {
     @Override
@@ -7,5 +9,8 @@ public class ClientWorker extends BaseWorker {
     }
 
     public void initializeConnection() {
+    }
+
+    public void onConnectionFailure() {
     }
 }

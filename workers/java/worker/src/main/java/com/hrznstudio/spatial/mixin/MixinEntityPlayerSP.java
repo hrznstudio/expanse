@@ -1,7 +1,6 @@
 package com.hrznstudio.spatial.mixin;
 
-import com.hrznstudio.spatial.ConnectionManager;
-import com.hrznstudio.spatial.ConnectionStatus;
+import com.hrznstudio.spatial.util.ConnectionManager;
 import improbable.Coordinates;
 import improbable.Position;
 import improbable.worker.EntityId;

@@ -1,5 +1,7 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.client;
 
+import com.hrznstudio.spatial.util.ConnectionManager;
+import com.hrznstudio.spatial.SpatialMod;
 import net.minecraft.client.gui.GuiScreen;
 
 public class GuiConnecting extends GuiScreen {
@@ -12,6 +14,8 @@ public class GuiConnecting extends GuiScreen {
         super.updateScreen();
         if(ConnectionManager.getConnectionStatus().isConnected()) {
             SpatialMod.getClientWorker().initializeConnection();
+        } else if(!ConnectionManager.getConnectionStatus().isConnecting()) {
+            SpatialMod.getClientWorker().onConnectionFailure();
         }
     }
 

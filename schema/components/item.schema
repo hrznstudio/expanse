@@ -7,5 +7,6 @@ type Item {
 type ItemStack {
   Item item = 1;
   int32 count = 2;
-  int32 metadata = 3;
+  int32 damage = 3;
+  option<bytes> nbt = 4;
 }

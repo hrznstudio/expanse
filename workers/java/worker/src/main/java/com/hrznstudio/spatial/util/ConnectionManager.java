@@ -1,6 +1,5 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.util;
 
-import improbable.collections.Option;
 import improbable.worker.*;
 
 import java.util.UUID;
