@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * ASM Hack to the PackageScanner to reduce connection time.
  */
-@Mixin(targets = "improbable.worker.PackageScanner")
+@Mixin(targets = "improbable.worker.PackageScanner", remap = false)
 public class MixinPackageScanner {
 
     private static final String[] prefixes = new String[]{
@@ -22,7 +22,7 @@ public class MixinPackageScanner {
      * @reason Reduce SpatialOS connection from 10 minutes to 3 seconds
      * @author Coded
      */
-    @Overwrite
+    @Overwrite(remap = false)
     public static <T> Set<Class<? extends T>> getAllSubClassesOf(final Class<T> desiredClass) {
         Set<Class<? extends T>> set = new HashSet<>();
         for (String prefix : prefixes) {

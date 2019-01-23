@@ -39,3 +39,7 @@ component Player {
   bool sneaking = 2;
   bool sprinting = 3;
 }
+
+component ChatAbility {
+  id = 1007;
+}

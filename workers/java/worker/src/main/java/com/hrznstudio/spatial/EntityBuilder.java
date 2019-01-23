@@ -4,6 +4,7 @@ import improbable.*;
 import improbable.worker.ComponentMetaclass;
 import improbable.worker.Entity;
 import improbable.worker.EntityId;
+import net.minecraft.client.gui.GuiMultiplayer;
 
 import java.util.HashMap;
 import java.util.Map;
