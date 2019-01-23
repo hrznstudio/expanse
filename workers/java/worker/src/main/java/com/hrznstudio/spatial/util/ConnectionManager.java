@@ -42,7 +42,7 @@ public class ConnectionManager {
                 connectionStatus = ConnectionStatus.CONNECTED;
                 dispatcher = new Dispatcher();
             } else {
-                connectionStatus = ConnectionStatus.DISCONNECTED;
+                connectionStatus = ConnectionStatus.FAILED;
                 System.out.println("Failed to connect to SpatialOS");
                 return;
             }
@@ -61,6 +61,7 @@ public class ConnectionManager {
                 @Override
                 public void call(Ops.Disconnect argument) {
                     connectionStatus = ConnectionStatus.DISCONNECTED;
+                    //TODO: trigger an event or smth
                 }
             });
         }, 0, TimeUnit.SECONDS);

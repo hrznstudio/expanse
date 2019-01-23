@@ -3,7 +3,8 @@ package com.hrznstudio.spatial.util;
 public enum ConnectionStatus {
     DISCONNECTED,
     CONNECTING,
-    CONNECTED;
+    CONNECTED,
+    FAILED;
 
     public boolean isConnected() {
         return this == CONNECTED;
@@ -11,5 +12,9 @@ public enum ConnectionStatus {
 
     public boolean isConnecting() {
         return this == CONNECTING;
+    }
+
+    public boolean isFailure() {
+        return this == FAILED;
     }
 }
