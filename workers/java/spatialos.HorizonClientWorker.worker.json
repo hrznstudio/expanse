@@ -1,7 +1,6 @@
 {
   "build": {
-    "tasks_filename": "spatialos.java.build.json",
-    "generated_build_scripts_type": "java"
+    "tasks_filename": "spatialos.java.build.json"
   },
   "bridge": {
     "worker_attribute_set": {
@@ -11,7 +10,7 @@
     },
     "entity_interest": {
       "range_entity_interest": {
-        "radius": 4
+        "radius": 50
       }
     },
     "streaming_query": [],
