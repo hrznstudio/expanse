@@ -17,10 +17,11 @@ jar {
     baseName = rootProject.name
     // Below instructs the jar plugin to build a jar from all the sources, recursively including the directories
     // (via zipTree). This yields a self-contained jar with all dependencies included within.
-    from {
-        configurations.compile.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
+    from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude '**/META-INF/services/**'
+        exclude '**/META-INF/*.SF'
+        exclude '**/META-INF/*.DSA'
+        exclude '**/META-INF/*.RSA'
     }
     manifest {
         attributes 'Main-Class': mainClass
