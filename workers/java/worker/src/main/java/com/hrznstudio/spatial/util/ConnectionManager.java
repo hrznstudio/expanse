@@ -1,8 +1,9 @@
 package com.hrznstudio.spatial.util;
 
 import improbable.worker.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,9 +13,9 @@ public class ConnectionManager {
     private static ScheduledFuture future;
     private static Connection connection;
     private static boolean isConnected;
-    private static Dispatcher dispatcher;
-    private static EntityId playerId;
+    private static final Logger logger = LogManager.getLogger(ConnectionManager.class.getSimpleName());
     private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
+    private static Dispatcher dispatcher = new Dispatcher();
 
     public static Connection getConnection() {
         return connection;
@@ -22,10 +23,6 @@ public class ConnectionManager {
 
     public static Dispatcher getDispatcher() {
         return dispatcher;
-    }
-
-    public static EntityId getPlayerId() {
-        return playerId;
     }
 
     public static ConnectionStatus getConnectionStatus() {
@@ -36,38 +33,27 @@ public class ConnectionManager {
         return future.isDone();
     }
 
-    public static void connect() {
+    public static void connect(final String workerName) {
         future = asyncExecutor.schedule(()-> {
-            connection = getConnection("HorizonClientWorker" + UUID.randomUUID(), "localhost", 22000);
+            connection = getConnection(workerName, "localhost", 22000);
             isConnected = connection.isConnected();
 
             if (isConnected) {
-                System.out.println("Successfully connected to SpatialOS");
+                logger.info("Successfully connected to SpatialOS");
                 connectionStatus = ConnectionStatus.CONNECTED;
-                dispatcher = new Dispatcher();
+                dispatcher.onDisconnect(dc -> {
+                    logger.info("Disconnected from SpatialOS");
+                    isConnected = false;
+                });
             } else {
                 connectionStatus = ConnectionStatus.FAILED;
-                System.out.println("Failed to connect to SpatialOS");
+                logger.info("Failed to connect to SpatialOS");
                 return;
             }
 
             new Thread(ConnectionManager::runEventLoop).start();
 
-            dispatcher.onCreateEntityResponse(new Callback<Ops.CreateEntityResponse>() {
-                @Override
-                public void call(Ops.CreateEntityResponse argument) {
-                    if (argument.statusCode == StatusCode.SUCCESS) {
-                        playerId = argument.entityId.get();
-                    }
-                }
-            });
-            dispatcher.onDisconnect(new Callback<Ops.Disconnect>() {
-                @Override
-                public void call(Ops.Disconnect argument) {
-                    connectionStatus = ConnectionStatus.DISCONNECTED;
-                    //TODO: trigger an event or smth
-                }
-            });
+
         }, 0, TimeUnit.SECONDS);
     }
 

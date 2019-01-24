@@ -1,5 +1,6 @@
 package com.hrznstudio.spatial.mixin;
 
+import com.hrznstudio.spatial.SpatialMod;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import improbable.Coordinates;
 import improbable.Position;
@@ -46,7 +47,7 @@ public class MixinEntityPlayerSP {
         if (ConnectionManager.getConnectionStatus().isConnected()) {
             boolean flag = playerSP.isSprinting();
 
-            EntityId id = ConnectionManager.getPlayerId();
+            EntityId id = SpatialMod.getClientWorker().getPlayerId();
             if (id == null) {
                 return;
             }

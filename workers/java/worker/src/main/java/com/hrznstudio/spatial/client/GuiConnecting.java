@@ -1,12 +1,15 @@
 package com.hrznstudio.spatial.client;
 
-import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.SpatialMod;
+import com.hrznstudio.spatial.util.ConnectionManager;
 import net.minecraft.client.gui.GuiScreen;
+
+import java.util.UUID;
 
 public class GuiConnecting extends GuiScreen {
     public GuiConnecting() {
-        ConnectionManager.connect();
+        ConnectionManager.connect("HorizonClientWorker" + UUID.randomUUID());
+        // TODO: this should maybe be moved to ClientWorker as a whole, the gui shouldn't access the connection directly
     }
 
     @Override
