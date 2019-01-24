@@ -39,6 +39,7 @@ repositories {
 }
 
 dependencies {
+    compile 'info.picocli:picocli:3.8.2'
     compile('org.reflections:reflections:0.9.11') {
         transitive = false
     }

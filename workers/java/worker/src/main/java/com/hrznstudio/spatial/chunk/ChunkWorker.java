@@ -1,21 +1,21 @@
 package com.hrznstudio.spatial.chunk;
 
-import com.hrznstudio.spatial.util.BaseWorker;
+import com.hrznstudio.spatial.WorkerService;
 import com.hrznstudio.spatial.util.CommonWorkerRequirements;
 import com.hrznstudio.spatial.util.EntityBuilder;
 import improbable.Position;
-import improbable.collections.Option;
 import improbable.worker.*;
 import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
 
-public class ChunkWorker extends BaseWorker {
+public class ChunkWorker implements WorkerService {
     @Override
     public String getWorkerID() {
         return "ChunkWorker";
     }
 
-    public static void main(String[] args) {
+    @Override
+    public void start() {
         System.out.println("Hello world");
     }
 

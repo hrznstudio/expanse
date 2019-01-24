@@ -1,21 +1,25 @@
 package com.hrznstudio.spatial.client;
 
-import com.hrznstudio.spatial.util.BaseWorker;
+import com.hrznstudio.spatial.WorkerService;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import improbable.worker.Dispatcher;
 import improbable.worker.EntityId;
 import improbable.worker.StatusCode;
 
-public class ClientWorker extends BaseWorker {
+public class ClientWorker implements WorkerService {
     private EntityId playerId;
 
     public EntityId getPlayerId() {
         return playerId;
     }
-
     @Override
     public String getWorkerID() {
         return "HorizonClientWorker";
+    }
+
+    @Override
+    public void start() {
+        throw new IllegalStateException("Client worker should never be started this way");
     }
 
     public void initializeConnection() {
