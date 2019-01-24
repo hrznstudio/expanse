@@ -1,0 +1,17 @@
+apply plugin: 'java'
+description = 'Worker SDK'
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'generated'
+        }
+    }
+}
+
+dependencies {
+    compile files('dependencies/sdk/java-worker-sdk.jar')
+    compile files('dependencies/sdk-native/java-worker-sdk-native-linux-x64.jar')
+    compile files('dependencies/sdk-native/java-worker-sdk-native-macos-x64.jar')
+    compile files('dependencies/sdk-native/java-worker-sdk-native-win32-x64.jar')
+}
