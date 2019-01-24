@@ -4,6 +4,7 @@ import com.hrznstudio.spatial.util.BaseWorker;
 import com.hrznstudio.spatial.util.CommonWorkerRequirements;
 import com.hrznstudio.spatial.util.EntityBuilder;
 import improbable.Position;
+import improbable.collections.Option;
 import improbable.worker.*;
 import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
@@ -22,14 +23,15 @@ public class ChunkWorker extends BaseWorker {
         final improbable.collections.Option<Integer> timeoutMillis = improbable.collections.Option.of(500);
 
         // Reserve an entity ID.
-        RequestId<ReserveEntityIdRequest> entityIdReservationRequestId = connection.sendReserveEntityIdRequest(timeoutMillis);
+        RequestId<ReserveEntityIdsRequest> entityIdReservationRequestId = connection.sendReserveEntityIdsRequest(1, timeoutMillis);
         // When the reservation succeeds, create an entity with the reserved ID.
 
-        dispatcher.onReserveEntityIdResponse(op -> {
+        dispatcher.onReserveEntityIdsResponse(op -> {
             if (op.requestId.equals(entityIdReservationRequestId) && op.statusCode == StatusCode.SUCCESS) {
                 EntityBuilder builder = new EntityBuilder("chunk");
                 builder.addComponent(ChunkStorage.COMPONENT, ChunkStorageData.create(), CommonWorkerRequirements.getAllCommonWorkers());
                 builder.addComponent(Position.COMPONENT, new improbable.PositionData(new improbable.Coordinates(1, 2, 3)), CommonWorkerRequirements.getAllCommonWorkers());
+                connection.sendCreateEntityRequest(builder.build(), op.firstEntityId, timeoutMillis);
             }
         });
     }
