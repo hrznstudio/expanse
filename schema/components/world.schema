@@ -9,14 +9,16 @@ type State {
   int32 meta = 2;
 }
 
-type ChunkList {
-  type InnerChunkList {
-    list<State> value = 1;
-  }
-  list<InnerChunkList> value = 1;
-}
-
+/**
+ * A single chunk holds 16x16x16 states.
+ */
 component ChunkStorage {
   id = 3001;
-  list<ChunkList> list = 1;
+
+  /*
+   * Map containing all the states in this chunk.
+   * The key is the position of the state inside the chunk, mapped as follows :
+   *    x << 4 + y << 2 + z
+   */
+  map<uint32, State> blocks = 2;
 }
