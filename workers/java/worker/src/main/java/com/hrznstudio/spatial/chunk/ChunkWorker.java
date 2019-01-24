@@ -1,11 +1,15 @@
 package com.hrznstudio.spatial.chunk;
 
-import com.hrznstudio.spatial.util.BaseWorker;
+import com.hrznstudio.spatial.WorkerService;
 
-public class ChunkWorker extends BaseWorker {
+public class ChunkWorker implements WorkerService {
     @Override
     public String getWorkerID() {
         return "ChunkWorker";
     }
 
+    @Override
+    public void start() {
+
+    }
 }

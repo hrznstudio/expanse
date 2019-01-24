@@ -1,11 +1,16 @@
 package com.hrznstudio.spatial.client;
 
-import com.hrznstudio.spatial.util.BaseWorker;
+import com.hrznstudio.spatial.WorkerService;
 
-public class ClientWorker extends BaseWorker {
+public class ClientWorker implements WorkerService {
     @Override
     public String getWorkerID() {
         return "HorizonClientWorker";
+    }
+
+    @Override
+    public void start() {
+        // Wont be run
     }
 
     public void initializeConnection() {
