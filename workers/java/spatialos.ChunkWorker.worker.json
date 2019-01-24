@@ -18,5 +18,22 @@
       "default": "RELIABLE_ORDERED",
       "checkout_all_initially": true
     }
+  },
+  "external": {
+    "default": {
+      "run_type": "EXECUTABLE",
+      "linux": {
+        "command": "java",
+        "arguments": [ "-cp", "build/libs/HorizonJavaWorker.jar", "com.hrznstudio.spatial.chunk.ChunkWorker" ]
+      },
+      "windows": {
+        "command": "java",
+        "arguments": [ "-cp", "build/libs/HorizonJavaWorker.jar", "com.hrznstudio.spatial.chunk.ChunkWorker" ]
+      },
+      "macos": {
+        "command": "java",
+        "arguments": [ "-cp", "build/libs/HorizonJavaWorker.jar", "com.hrznstudio.spatial.chunk.ChunkWorker" ]
+      }
+    }
   }
 }
