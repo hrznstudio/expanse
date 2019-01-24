@@ -1,5 +1,7 @@
 package minecraft.world;
 
+// Reserves 1300-1399
+
 type Block {
   string id = 1;
 }
@@ -17,6 +19,11 @@ type ChunkList {
 }
 
 component ChunkStorage {
-  id = 3001;
+  id = 1300;
   list<ChunkList> list = 1;
+}
+
+
+component Tile {
+  id = 1301;
 }

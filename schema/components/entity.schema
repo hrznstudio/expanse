@@ -1,6 +1,8 @@
 package minecraft.entity;
 import "improbable/standard_library.schema";
 
+// Reserves 1000-1099
+
 component Health {
   id = 1001;
   int32 current = 1;
