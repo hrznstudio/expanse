@@ -5,7 +5,6 @@ import picocli.CommandLine;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-
 @CommandLine.Command(name = "worker", sortOptions = false,
 
         header = {
@@ -19,17 +18,19 @@ import java.util.ServiceLoader;
 )
 public class WorkerManager implements Runnable {
 
-    public static Map<String, WorkerService> workerMap = new HashMap<>();
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "Displays commands and usage help.")
     private boolean help;
+
     @CommandLine.Parameters(description = "Worker to run")
     private String worker;
 
-    public static void main(String... main) {
+    public static Map<String, WorkerService> workerMap = new HashMap<>();
+
+    public static void main(String... args) {
         ServiceLoader<WorkerService> workerService = ServiceLoader.load(WorkerService.class);
         workerService.forEach(service -> workerMap.put(service.getWorkerID(), service));
 
-        CommandLine.run(new WorkerManager(), System.out, "HorizonClientWorker");
+        CommandLine.run(new WorkerManager(), System.out, args);
     }
 
     @Override
