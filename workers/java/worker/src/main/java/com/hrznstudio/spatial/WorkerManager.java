@@ -27,11 +27,11 @@ public class WorkerManager implements Runnable {
 
     public static Map<String, WorkerService> workerMap = new HashMap<>();
 
-    public static void main(String... main) {
+    public static void main(String... args) {
         ServiceLoader<WorkerService> workerService = ServiceLoader.load(WorkerService.class);
         workerService.forEach(service -> workerMap.put(service.getWorkerID(), service));
 
-        CommandLine.run(new WorkerManager(), System.out, "HorizonClientWorker");
+        CommandLine.run(new WorkerManager(), System.out, args);
     }
 
     @Override
