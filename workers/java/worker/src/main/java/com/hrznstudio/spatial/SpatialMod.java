@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.util.Collections;
 import java.util.UUID;
 
-@Mod(modid = "spatial")
+@Mod(modid = "spatial", name = "Spatial", version = "0.0.1")
 @Mod.EventBusSubscriber
 public class SpatialMod {
 
