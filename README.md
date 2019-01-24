@@ -20,7 +20,7 @@ The traditional ways to develop large online games mean that you’re either lim
 SpatialOS works differently: it brings together many servers so they’re working as one. But it does this in a way that makes a single world which looks seamless to players.
 ![alt tag](docs/deployment.png)
 
-## How can I contribute?
+## How can I contribute? [![Open Source Helpers](https://www.codetriage.com/hrznstudio/spatial/badges/users.svg)](https://www.codetriage.com/hrznstudio/spatial)
 
 ### Prerequisites
 - [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
