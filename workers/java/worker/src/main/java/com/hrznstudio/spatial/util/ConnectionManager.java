@@ -32,6 +32,10 @@ public class ConnectionManager {
         return connectionStatus;
     }
 
+    public static boolean hasConnectionFinished() {
+        return future.isDone();
+    }
+
     public static void connect() {
         future = asyncExecutor.schedule(()-> {
             connection = getConnection("HorizonClientWorker" + UUID.randomUUID(), "localhost", 22000);

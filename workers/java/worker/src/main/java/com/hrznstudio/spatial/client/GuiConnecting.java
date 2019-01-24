@@ -14,7 +14,7 @@ public class GuiConnecting extends GuiScreen {
         super.updateScreen();
         if(ConnectionManager.getConnectionStatus().isConnected()) {
             SpatialMod.getClientWorker().initializeConnection();
-        } else if(ConnectionManager.getConnectionStatus().isFailure()) {
+        } else if(ConnectionManager.hasConnectionFinished() || ConnectionManager.getConnectionStatus().isFailure()) {
             SpatialMod.getClientWorker().onConnectionFailure();
         }
     }
