@@ -1,5 +1,8 @@
 package com.hrznstudio.spatial;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 import java.util.HashMap;
@@ -27,7 +30,14 @@ public class WorkerManager implements Runnable {
 
     public static Map<String, WorkerService> workerMap = new HashMap<>();
 
+    private static Logger logger = LogManager.getLogger(WorkerManager.class.getSimpleName());
+
     public static void main(String... args) {
+        int i = ArrayUtils.indexOf(args, "--version");
+        if (i != ArrayUtils.INDEX_NOT_FOUND) {
+            args = ArrayUtils.subarray(args, 0, i);
+        } else
+            logger.warn("Running the WorkerManager directly is not recommended. Please use SpatialLaunchWrapper instead.");
         ServiceLoader<WorkerService> workerService = ServiceLoader.load(WorkerService.class);
         workerService.forEach(service -> workerMap.put(service.getWorkerID(), service));
 
