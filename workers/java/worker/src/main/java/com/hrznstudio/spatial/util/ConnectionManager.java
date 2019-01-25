@@ -15,8 +15,9 @@ public class ConnectionManager {
     private static boolean isConnected;
     private static final Logger logger = LogManager.getLogger(ConnectionManager.class.getSimpleName());
     private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
-    private static Dispatcher dispatcher = new Dispatcher();
+    private static Dispatcher dispatcher;
     private static Runnable connectionCallback = null;
+    private static boolean useView = false;
 
     public static Connection getConnection() {
         return connection;
@@ -24,6 +25,11 @@ public class ConnectionManager {
 
     public static Dispatcher getDispatcher() {
         return dispatcher;
+    }
+
+    public static View getView() {
+        if (!useView) throw new IllegalStateException("This ConnectionManager isn't in view mode!");
+        return (View) dispatcher;
     }
 
     public static ConnectionStatus getConnectionStatus() {
@@ -34,14 +40,16 @@ public class ConnectionManager {
         return future.isDone();
     }
 
-    public static void connect(final String workerName) {
-        future = asyncExecutor.schedule(()-> {
+    public static void connect(final String workerName, final boolean useView) {
+        ConnectionManager.useView = useView;
+        future = asyncExecutor.schedule(() -> {
             connection = getConnection(workerName, "localhost", 22000);
             isConnected = connection.isConnected();
 
             if (isConnected) {
                 logger.info("Successfully connected to SpatialOS");
                 connectionStatus = ConnectionStatus.CONNECTED;
+                dispatcher = useView ? new View() : new Dispatcher();
                 dispatcher.onDisconnect(dc -> {
                     logger.info("Disconnected from SpatialOS");
                     isConnected = false;
@@ -57,6 +65,10 @@ public class ConnectionManager {
 
 
         }, 0, TimeUnit.SECONDS);
+    }
+
+    public static void connect(final String workerName) {
+        connect(workerName, false);
     }
 
     public static void setConnectionCallback(Runnable connectionCallback) {
