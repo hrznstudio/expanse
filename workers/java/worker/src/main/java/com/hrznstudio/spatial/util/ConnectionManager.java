@@ -16,6 +16,7 @@ public class ConnectionManager {
     private static final Logger logger = LogManager.getLogger(ConnectionManager.class.getSimpleName());
     private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
     private static Dispatcher dispatcher = new Dispatcher();
+    private static Runnable connectionCallback = null;
 
     public static Connection getConnection() {
         return connection;
@@ -45,6 +46,7 @@ public class ConnectionManager {
                     logger.info("Disconnected from SpatialOS");
                     isConnected = false;
                 });
+                if (connectionCallback != null) connectionCallback.run();
             } else {
                 connectionStatus = ConnectionStatus.FAILED;
                 logger.info("Failed to connect to SpatialOS");
@@ -57,6 +59,9 @@ public class ConnectionManager {
         }, 0, TimeUnit.SECONDS);
     }
 
+    public static void setConnectionCallback(Runnable connectionCallback) {
+        ConnectionManager.connectionCallback = connectionCallback;
+    }
 
     private static Connection getConnection(String workerId, String hostname, int port) {
         connectionStatus = ConnectionStatus.CONNECTING;
