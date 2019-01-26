@@ -10,8 +10,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ConnectionManager {
-    // Using stealing pools with a parallelism of 1 will make these behave similarly to Actors
-    private static ExecutorService loginPool = Executors.newWorkStealingPool(1);
+    // Having this be a fixed thread pool serves as keep-alive until the event loop kicks in
+    private static ExecutorService loginPool = Executors.newFixedThreadPool(1);
+    // Using a stealing pool with a parallelism of 1 makes this behave similarly to Actors
     private static ExecutorService processingPool = Executors.newWorkStealingPool(1);
     private static Future future;
     private static Connection connection;
