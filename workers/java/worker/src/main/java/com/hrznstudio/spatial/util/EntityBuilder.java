@@ -31,4 +31,14 @@ public class EntityBuilder {
 
         return entity;
     }
+
+    public Entity build(final WorkerRequirementSet requirementSet) {
+        entity.add(Persistence.COMPONENT, new PersistenceData());
+        entity.add(EntityAcl.COMPONENT, new EntityAclData(
+                requirementSet,
+                write_access
+        ));
+
+        return entity;
+    }
 }
