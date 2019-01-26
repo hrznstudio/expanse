@@ -5,9 +5,9 @@ import com.hrznstudio.spatial.client.vanillawrappers.SpatialNetworkManager;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.ConnectionStatus;
 import improbable.worker.EntityId;
-import improbable.worker.View;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketJoinGame;
@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class ClientWorker implements WorkerService {
     private EntityId playerId;
-    private View view;
+    private ClientView view;
     private NetHandlerPlayClient netHandlerPlayClient;
     private NetworkManager networkManager;
     private GuiMainMenu guiMainMenu;
@@ -43,7 +43,7 @@ public class ClientWorker implements WorkerService {
         //noinspection ConstantConditions
         if (mc == null) throw new IllegalStateException("Client worker should never be started this way");
         guiMainMenu = new GuiMainMenu();
-        ConnectionManager.connect(getWorkerID() + '$' + mc.getSession().getProfile().getId() + "$" + UUID.randomUUID(), view = new View());
+        ConnectionManager.connect(getWorkerID() + '$' + mc.getSession().getProfile().getId() + "$" + UUID.randomUUID(), view = new ClientView());
         ConnectionManager.setConnectionCallback(this::initializeConnection);
     }
 
@@ -82,7 +82,12 @@ public class ClientWorker implements WorkerService {
         });
     }
 
-    public void onConnectionFailure() {
-        // TODO
+    private void onConnectionFailure() {
+        WorldClient wc = Minecraft.getMinecraft().world;
+        if (wc != null) wc.sendQuittingDisconnectingPacket();
+    }
+
+    public ClientView getView() {
+        return view;
     }
 }

@@ -10,7 +10,7 @@
     },
     "entity_interest": {
       "range_entity_interest": {
-        "radius": 2
+        "radius": 150
       }
     },
     "streaming_query": [],
@@ -26,27 +26,27 @@
         "artifact_name": "HorizonJavaWorker@Linux.zip",
         "command": "java",
         "arguments": [
-          "-cp",
+          "-jar",
           "HorizonJavaWorker.jar",
-          "com.hrznstudio.spatial.chunk.ChunkWorker"
+          "ChunkWorker"
         ]
       },
       "windows": {
         "artifact_name": "HorizonJavaWorker@Windows.zip",
         "command": "java",
         "arguments": [
-          "-cp",
+          "-jar",
           "HorizonJavaWorker.jar",
-          "com.hrznstudio.spatial.chunk.ChunkWorker"
+          "ChunkWorker"
         ]
       },
       "macos": {
         "artifact_name": "HorizonJavaWorker@Mac.zip",
         "command": "java",
         "arguments": [
-          "-cp",
+          "-jar",
           "HorizonJavaWorker.jar",
-          "com.hrznstudio.spatial.chunk.ChunkWorker"
+          "ChunkWorker"
         ]
       }
     }

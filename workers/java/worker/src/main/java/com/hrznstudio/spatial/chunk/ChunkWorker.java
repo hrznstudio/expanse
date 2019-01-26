@@ -54,7 +54,7 @@ public class ChunkWorker implements WorkerService {
                 EntityBuilder builder = new EntityBuilder(CHUNK);
                 builder.addComponent(ChunkStorage.COMPONENT, new ChunkStorageData(tmpChunk), CHUNK_REQUIREMENT_SET);
                 builder.addComponent(Position.COMPONENT, new improbable.PositionData(position), CHUNK_REQUIREMENT_SET);
-                connection.sendCreateEntityRequest(builder.build(CHUNK_REQUIREMENT_SET), op.firstEntityId, timeoutMillis);
+                connection.sendCreateEntityRequest(builder.build(), op.firstEntityId, timeoutMillis);
             }
         });
     }
@@ -73,6 +73,6 @@ public class ChunkWorker implements WorkerService {
     private void onConnected() {
         logger.info("Connection status: " + ConnectionManager.getConnectionStatus());
         System.out.println();
-//        createChunk(ConnectionManager.getDispatcher(), ConnectionManager.getConnection(), new Coordinates(0, 0, 0));
+        createChunk(ConnectionManager.getDispatcher(), ConnectionManager.getConnection(), new Coordinates(0, 0, 0));
     }
 }
