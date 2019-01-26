@@ -10,7 +10,12 @@ jar {
     baseName = rootProject.name
     from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) })
     manifest {
-        attributes 'Main-Class': gradle.ext.mainClass
+        attributes([
+                'FMLAT'         : 'spatial_at.cfg',
+                'Main-Class': gradle.ext.mainClass,
+                'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}",
+                'Timestamp'     : System.currentTimeMillis()
+        ])
     }
 }
 

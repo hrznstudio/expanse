@@ -33,16 +33,6 @@ minecraft {
     serverJvmArgs = ["-Dfml.coreMods.load=$core_plugin"]
 }
 
-jar {
-    manifest {
-        attributes([
-                'FMLAT'         : 'spatial_at.cfg',
-                'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}",
-                'Timestamp'     : System.currentTimeMillis()
-        ])
-    }
-}
-
 repositories {
     mavenCentral()
     maven {
