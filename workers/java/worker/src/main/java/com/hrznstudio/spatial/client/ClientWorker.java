@@ -43,7 +43,7 @@ public class ClientWorker implements WorkerService {
         //noinspection ConstantConditions
         if (mc == null) throw new IllegalStateException("Client worker should never be started this way");
         guiMainMenu = new GuiMainMenu();
-        ConnectionManager.connect(getWorkerID() + '$' + mc.getSession().getProfile().getId() + "$" + UUID.randomUUID(), true);
+        ConnectionManager.connect(getWorkerID() + '$' + mc.getSession().getProfile().getId() + "$" + UUID.randomUUID(), view = new View());
         ConnectionManager.setConnectionCallback(this::initializeConnection);
     }
 
@@ -57,7 +57,6 @@ public class ClientWorker implements WorkerService {
     }
 
     private void initializeConnection() {
-        view = ConnectionManager.getView();
         view.onDisconnect(argument -> onConnectionFailure());
 
         Minecraft mc = Minecraft.getMinecraft();

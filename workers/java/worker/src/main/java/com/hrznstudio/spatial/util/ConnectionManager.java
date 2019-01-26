@@ -20,7 +20,6 @@ public class ConnectionManager {
     private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
     private static Dispatcher dispatcher;
     private static Runnable connectionCallback = null;
-    private static boolean useView = false;
 
     public static Connection getConnection() {
         return connection;
@@ -28,11 +27,6 @@ public class ConnectionManager {
 
     public static Dispatcher getDispatcher() {
         return dispatcher;
-    }
-
-    public static View getView() {
-        if (!useView) throw new IllegalStateException("This ConnectionManager isn't in view mode!");
-        return (View) dispatcher;
     }
 
     public static ConnectionStatus getConnectionStatus() {
@@ -54,17 +48,16 @@ public class ConnectionManager {
         return future.isDone();
     }
 
-    public static void connect(final String workerName, final boolean useView) {
-        if (future != null && !future.isDone() && useView != ConnectionManager.useView) future.cancel(true);
+    public static void connect(final String workerName, final Dispatcher dispatcher) {
+        if (future != null && !future.isDone() && dispatcher != ConnectionManager.dispatcher) future.cancel(true);
         if (future == null || future.isDone()) {
-            ConnectionManager.useView = useView;
             future = loginPool.submit(() -> {
                 connection = getConnection(workerName, "localhost", 22000);
                 connectionStatus = connection.isConnected() ? ConnectionStatus.CONNECTED : ConnectionStatus.FAILED;
 
                 if (isConnected()) {
                     logger.info("Successfully connected to SpatialOS");
-                    dispatcher = useView ? new View() : new Dispatcher();
+                    ConnectionManager.dispatcher = dispatcher;
                     dispatcher.onDisconnect(dc -> {
                         logger.info("Disconnected from SpatialOS");
                         connectionStatus = ConnectionStatus.DISCONNECTED;
@@ -78,6 +71,10 @@ public class ConnectionManager {
                 new Thread(ConnectionManager::runEventLoop).start();
             });
         }
+    }
+
+    public static void connect(final String workerName, final boolean useView) {
+        connect(workerName, useView ? new View() : new Dispatcher());
     }
 
     public static void connect(final String workerName) {

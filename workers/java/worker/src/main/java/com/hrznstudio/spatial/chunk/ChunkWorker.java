@@ -72,7 +72,6 @@ public class ChunkWorker implements WorkerService {
 
     private void onConnected() {
         logger.info("Connection status: " + ConnectionManager.getConnectionStatus());
-        View v = ConnectionManager.getView();
         System.out.println();
 //        createChunk(ConnectionManager.getDispatcher(), ConnectionManager.getConnection(), new Coordinates(0, 0, 0));
     }
