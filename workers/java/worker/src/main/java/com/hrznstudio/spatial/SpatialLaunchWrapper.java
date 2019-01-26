@@ -2,27 +2,46 @@ package com.hrznstudio.spatial;
 
 import net.minecraft.launchwrapper.Launch;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
 public final class SpatialLaunchWrapper {
+    private static final Logger logger = LogManager.getLogger(SpatialLaunchWrapper.class.getSimpleName());
 
     private SpatialLaunchWrapper() {
     }
 
-    public static void main(String[] args) {
-        setEnvironment();
-        Launch.main(ArrayUtils.addAll(args,
+    private static String[] tweaks() {
+        String[] tweaks = new String[]{
                 "--tweakClass",
                 SpatialTweaker.class.getName(),
                 "--tweakClass",
-                "net.minecraftforge.fml.common.launcher.FMLTweaker",
-//        "net.minecraftforge.fml.common.launcher.FMLServerTweaker",
-                "--tweakClass",
-                "net.minecraftforge.gradle.tweakers.CoremodTweaker"
-        ));
+                "net.minecraftforge.fml.common.launcher.FMLTweaker"
+//                "net.minecraftforge.fml.common.launcher.FMLServerTweaker"
+        };
+        try {
+            Class.forName("net.minecraftforge.gradle.tweakers.CoremodTweaker");
+            ArrayUtils.addAll(tweaks,
+                    "--tweakClass",
+                    "net.minecraftforge.gradle.tweakers.CoremodTweaker"
+            );
+        } catch (ClassNotFoundException ignored) {
+            // Not in dev environment
+        }
+        return tweaks;
+    }
+
+    public static void main(String[] args) {
+        setEnvironment();
+        try {
+            Launch.main(ArrayUtils.addAll(args, tweaks()));
+        } catch (Throwable e) {
+            logger.fatal("This is bad !", e);
+        }
     }
 
     private static void setEnvironment() {

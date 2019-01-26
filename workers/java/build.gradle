@@ -1,30 +1,16 @@
 apply plugin: 'java'
-repositories {
-    maven { url 'http://repo.maven.apache.org/maven2' }
-    maven {
-        url 'https://repo.spongepowered.org/maven/'
-    }
-}
 
 dependencies {
-    compile project(':worker')
-    compile project(':worker-sdk')
+    compile (project(':worker')) {
+        transitive false
+    }
 }
-
-def mainClass = gradle.ext.mainClass
 
 jar {
     baseName = rootProject.name
-    // Below instructs the jar plugin to build a jar from all the sources, recursively including the directories
-    // (via zipTree). This yields a self-contained jar with all dependencies included within.
-    from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
-        exclude '**/META-INF/services/**'
-        exclude '**/META-INF/*.SF'
-        exclude '**/META-INF/*.DSA'
-        exclude '**/META-INF/*.RSA'
-    }
+    from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) })
     manifest {
-        attributes 'Main-Class': mainClass
+        attributes 'Main-Class': gradle.ext.mainClass
     }
 }
 
