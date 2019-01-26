@@ -4,6 +4,7 @@ import improbable.worker.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +13,6 @@ public class ConnectionManager {
     private static ScheduledThreadPoolExecutor asyncExecutor = new ScheduledThreadPoolExecutor(1);
     private static ScheduledFuture future;
     private static Connection connection;
-    private static boolean isConnected;
     private static final Logger logger = LogManager.getLogger(ConnectionManager.class.getSimpleName());
     private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
     private static Dispatcher dispatcher;
@@ -36,35 +36,45 @@ public class ConnectionManager {
         return connectionStatus;
     }
 
+    public static void disconnect() {
+        if (future != null && !future.isDone()) future.cancel(true);
+        connectionStatus = ConnectionStatus.DISCONNECTED;
+        try {
+            connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        dispatcher = null;
+    }
+
     public static boolean hasConnectionFinished() {
         return future.isDone();
     }
 
     public static void connect(final String workerName, final boolean useView) {
-        ConnectionManager.useView = useView;
-        future = asyncExecutor.schedule(() -> {
-            connection = getConnection(workerName, "localhost", 22000);
-            isConnected = connection.isConnected();
+        if (future != null && !future.isDone() && useView != ConnectionManager.useView) future.cancel(true);
+        if (future == null || future.isDone()) {
+            ConnectionManager.useView = useView;
+            future = asyncExecutor.schedule(() -> {
+                connection = getConnection(workerName, "localhost", 22000);
+                connectionStatus = connection.isConnected() ? ConnectionStatus.CONNECTED : ConnectionStatus.FAILED;
 
-            if (isConnected) {
-                logger.info("Successfully connected to SpatialOS");
-                connectionStatus = ConnectionStatus.CONNECTED;
-                dispatcher = useView ? new View() : new Dispatcher();
-                dispatcher.onDisconnect(dc -> {
-                    logger.info("Disconnected from SpatialOS");
-                    isConnected = false;
-                });
-                if (connectionCallback != null) connectionCallback.run();
-            } else {
-                connectionStatus = ConnectionStatus.FAILED;
-                logger.info("Failed to connect to SpatialOS");
-                return;
-            }
+                if (isConnected()) {
+                    logger.info("Successfully connected to SpatialOS");
+                    dispatcher = useView ? new View() : new Dispatcher();
+                    dispatcher.onDisconnect(dc -> {
+                        logger.info("Disconnected from SpatialOS");
+                        connectionStatus = ConnectionStatus.DISCONNECTED;
+                    });
+                    if (connectionCallback != null) connectionCallback.run();
+                } else {
+                    logger.info("Failed to connect to SpatialOS");
+                    return;
+                }
 
-            new Thread(ConnectionManager::runEventLoop).start();
-
-
-        }, 0, TimeUnit.SECONDS);
+                new Thread(ConnectionManager::runEventLoop).start();
+            }, 0, TimeUnit.SECONDS);
+        }
     }
 
     public static void connect(final String workerName) {
@@ -90,7 +100,7 @@ public class ConnectionManager {
 
     private static void runEventLoop() {
         java.time.Duration maxWait = java.time.Duration.ofMillis(Math.round(1000.0 / UPDATES_PER_SECOND));
-        while (isConnected) {
+        while (isConnected()) {
             long startTime = System.nanoTime();
             OpList opList = connection.getOpList(0);
             dispatcher.process(opList);
@@ -104,5 +114,9 @@ public class ConnectionManager {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static boolean isConnected() {
+        return connectionStatus.isConnected();
     }
 }
