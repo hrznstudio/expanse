@@ -5,13 +5,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ConnectionManager {
-    private static ScheduledThreadPoolExecutor asyncExecutor = new ScheduledThreadPoolExecutor(1);
-    private static ScheduledFuture future;
+    // Using stealing pools with a parallelism of 1 will make these behave similarly to Actors
+    private static ExecutorService loginPool = Executors.newWorkStealingPool(1);
+    private static ExecutorService processingPool = Executors.newWorkStealingPool(1);
+    private static Future future;
     private static Connection connection;
     private static final Logger logger = LogManager.getLogger(ConnectionManager.class.getSimpleName());
     private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
@@ -55,7 +57,7 @@ public class ConnectionManager {
         if (future != null && !future.isDone() && useView != ConnectionManager.useView) future.cancel(true);
         if (future == null || future.isDone()) {
             ConnectionManager.useView = useView;
-            future = asyncExecutor.schedule(() -> {
+            future = loginPool.submit(() -> {
                 connection = getConnection(workerName, "localhost", 22000);
                 connectionStatus = connection.isConnected() ? ConnectionStatus.CONNECTED : ConnectionStatus.FAILED;
 
@@ -73,7 +75,7 @@ public class ConnectionManager {
                 }
 
                 new Thread(ConnectionManager::runEventLoop).start();
-            }, 0, TimeUnit.SECONDS);
+            });
         }
     }
 
@@ -103,7 +105,7 @@ public class ConnectionManager {
         while (isConnected()) {
             long startTime = System.nanoTime();
             OpList opList = connection.getOpList(0);
-            dispatcher.process(opList);
+            processingPool.submit(() -> dispatcher.process(opList));
 
             long stopTime = System.nanoTime();
             java.time.Duration waitFor = maxWait.minusNanos(stopTime - startTime);
