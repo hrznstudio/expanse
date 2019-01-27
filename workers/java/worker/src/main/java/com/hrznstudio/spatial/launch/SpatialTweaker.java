@@ -1,4 +1,4 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.launch;
 
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -20,7 +20,7 @@ public final class SpatialTweaker implements ITweaker {
 
     @Override
     public String getLaunchTarget() {
-        return "com.hrznstudio.spatial.WorkerManager";
+        return "com.hrznstudio.spatial.worker.WorkerManager";
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.launch;
 
 import net.minecraft.launchwrapper.Launch;
 import org.apache.commons.lang3.ArrayUtils;

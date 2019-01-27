@@ -1,4 +1,4 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.worker;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +27,7 @@ public class WorkerManager implements Runnable {
     @CommandLine.Parameters(description = "Worker to run")
     private String worker;
 
-    public static Map<String, WorkerService> workerMap = new HashMap<>();
+    private static Map<String, WorkerService> workerMap = new HashMap<>();
 
     private static Logger logger = LogManager.getLogger(WorkerManager.class.getSimpleName());
 

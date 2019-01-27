@@ -1,4 +1,4 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.worker;
 
 import com.hrznstudio.spatial.util.ConnectionManager;
 import improbable.worker.Dispatcher;

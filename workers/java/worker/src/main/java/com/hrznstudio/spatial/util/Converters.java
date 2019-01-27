@@ -17,6 +17,10 @@ public abstract class Converters {
     }
 
     public static int blockPosToChunkIndex(final BlockPos position) {
-        return (position.getX() % 16 << 8) + (position.getY() % 16 << 4) + position.getZ() % 16;
+        return blockPosToChunkIndex(position.getX(), position.getY(), position.getZ());
+    }
+
+    public static int blockPosToChunkIndex(final int x, final int y, final int z) {
+        return (x % 16 << 8) + (y % 16 << 4) + z % 16;
     }
 }

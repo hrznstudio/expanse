@@ -1,21 +1,24 @@
 package com.hrznstudio.spatial.client.vanillawrappers;
 
 import com.hrznstudio.spatial.SpatialMod;
-import com.hrznstudio.spatial.client.ClientView;
 import com.hrznstudio.spatial.util.Converters;
+import improbable.Position;
+import improbable.PositionData;
+import improbable.collections.Option;
+import improbable.worker.Entity;
+import improbable.worker.EntityId;
 import mcp.MethodsReturnNonnullByDefault;
+import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
-import minecraft.world.State;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.init.Blocks;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldSettings;
+import net.minecraft.world.chunk.IChunkProvider;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BiConsumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -26,16 +29,26 @@ public class WorldClientSpatial extends WorldClient {
     }
 
     @Override
-    public IBlockState getBlockState(final BlockPos pos) {
-        final ClientView view = SpatialMod.getClientWorker().getDispatcher();
-        if (view == null) return Blocks.AIR.getDefaultState();
-        final ChunkStorageData chunk = view.getChunkFromBlock(pos);
-        if (chunk == null) return Blocks.AIR.getDefaultState();
-        final State state = chunk.getBlocks().get(Converters.blockPosToChunkIndex(pos));
-        if (state == null) return Blocks.AIR.getDefaultState();
-        final net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(state.getBlock().getId());
-        if (block == null) return Blocks.AIR.getDefaultState();
-        //noinspection deprecation
-        return block.getStateFromMeta(state.getMeta());
-    } // In Kotlin, all of those null checks would be chained as one >.<
+    protected IChunkProvider createChunkProvider() {
+        this.clientChunkProvider = new SpatialChunkProvider(this);
+        return this.clientChunkProvider;
+    }
+
+    @Override
+    public void tick() {
+
+    }
+
+    public void refreshChunks() {
+        SpatialMod.getClientWorker().getDispatcher().entities.forEach(new BiConsumer<EntityId, Entity>() {
+            @Override
+            public void accept(EntityId entityId, Entity entity) {
+                Option<ChunkStorageData> dataOption = entity.get(ChunkStorage.COMPONENT);
+                Option<PositionData> positionOption = entity.get(Position.COMPONENT);
+                if(dataOption.isPresent()&&positionOption.isPresent()) {
+                    ((SpatialChunkProvider)chunkProvider).setChunk(Converters.improbableToBlockPos(positionOption.get()), dataOption.get());
+                }
+            }
+        });
+    }
 }

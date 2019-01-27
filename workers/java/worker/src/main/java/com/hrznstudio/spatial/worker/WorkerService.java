@@ -1,4 +1,4 @@
-package com.hrznstudio.spatial;
+package com.hrznstudio.spatial.worker;
 
 import java.util.UUID;
 
