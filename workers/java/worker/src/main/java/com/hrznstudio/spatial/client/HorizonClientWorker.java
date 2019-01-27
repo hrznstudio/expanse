@@ -1,10 +1,11 @@
 package com.hrznstudio.spatial.client;
 
-import com.hrznstudio.spatial.WorkerService;
+import com.hrznstudio.spatial.BaseWorker;
 import com.hrznstudio.spatial.client.vanillawrappers.SpatialNetworkManager;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.ConnectionStatus;
 import improbable.worker.EntityId;
+import improbable.worker.Ops;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -18,23 +19,21 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
-import java.util.UUID;
 
-public class ClientWorker implements WorkerService {
+public final class HorizonClientWorker extends BaseWorker<ClientView> {
     private EntityId playerId;
-    private ClientView view;
     private NetHandlerPlayClient netHandlerPlayClient;
     private NetworkManager networkManager;
     private GuiMainMenu guiMainMenu;
 
-    public EntityId getPlayerId() {
-        return playerId;
+    public HorizonClientWorker() {
+        super(ClientView::new);
     }
 
-    @Override
-    public String getWorkerID() {
-        return "HorizonClientWorker";
+    public EntityId getPlayerId() {
+        return playerId;
     }
 
     @Override
@@ -43,22 +42,21 @@ public class ClientWorker implements WorkerService {
         //noinspection ConstantConditions
         if (mc == null) throw new IllegalStateException("Client worker should never be started this way");
         guiMainMenu = new GuiMainMenu();
-        ConnectionManager.connect(getWorkerID() + '$' + mc.getSession().getProfile().getId() + "$" + UUID.randomUUID(), view = new ClientView());
-        ConnectionManager.setConnectionCallback(this::initializeConnection);
+
+        this.setName(makeName());
+        super.start();
     }
 
     public void stop() {
         ConnectionManager.disconnect();
-        this.view = null;
     }
 
     public ConnectionStatus getConnectionStatus() {
         return ConnectionManager.getConnectionStatus();
     }
 
-    private void initializeConnection() {
-        view.onDisconnect(argument -> onConnectionFailure());
-
+    @Override
+    protected void onConnected() {
         Minecraft mc = Minecraft.getMinecraft();
         networkManager = new SpatialNetworkManager(this);
         netHandlerPlayClient = new NetHandlerPlayClient(mc, guiMainMenu, networkManager, mc.getSession().getProfile());
@@ -82,12 +80,10 @@ public class ClientWorker implements WorkerService {
         });
     }
 
-    private void onConnectionFailure() {
+    @Override
+    protected void onDisConnected(@Nonnull final Ops.Disconnect reason) {
+        super.onDisConnected(reason);
         WorldClient wc = Minecraft.getMinecraft().world;
         if (wc != null) wc.sendQuittingDisconnectingPacket();
-    }
-
-    public ClientView getView() {
-        return view;
     }
 }

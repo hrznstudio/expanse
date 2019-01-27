@@ -48,11 +48,11 @@ public class ConnectionManager {
         return future.isDone();
     }
 
-    public static void connect(final String workerName, final Dispatcher dispatcher) {
+    public static void connect(final String workerName, final String workerType, final Dispatcher dispatcher) {
         if (future != null && !future.isDone() && dispatcher != ConnectionManager.dispatcher) future.cancel(true);
         if (future == null || future.isDone()) {
             future = loginPool.submit(() -> {
-                connection = getConnection(workerName, "localhost", 22000);
+                connection = getConnection(workerName, workerType, "localhost", 22000);
                 connectionStatus = connection.isConnected() ? ConnectionStatus.CONNECTED : ConnectionStatus.FAILED;
 
                 if (isConnected()) {
@@ -73,22 +73,18 @@ public class ConnectionManager {
         }
     }
 
-    public static void connect(final String workerName, final boolean useView) {
-        connect(workerName, useView ? new View() : new Dispatcher());
-    }
-
-    public static void connect(final String workerName) {
-        connect(workerName, false);
+    public static void connect(final String workerName, final String workerType, final boolean useView) {
+        connect(workerName, workerType, useView ? new View() : new Dispatcher());
     }
 
     public static void setConnectionCallback(Runnable connectionCallback) {
         ConnectionManager.connectionCallback = connectionCallback;
     }
 
-    private static Connection getConnection(String workerId, String hostname, int port) {
+    private static Connection getConnection(final String workerId, final String workerType, final String hostname, final int port) {
         connectionStatus = ConnectionStatus.CONNECTING;
         ConnectionParameters parameters = new ConnectionParameters();
-        parameters.workerType = "HorizonClientWorker";
+        parameters.workerType = workerType;
         parameters.network = new NetworkParameters();
         parameters.network.connectionType = NetworkConnectionType.Tcp;
         parameters.network.useExternalIp = false;

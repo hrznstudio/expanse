@@ -38,7 +38,7 @@ public class WorkerManager implements Runnable {
         } else
             logger.warn("Running the WorkerManager directly is not recommended. Please use SpatialLaunchWrapper instead.");
         ServiceLoader<WorkerService> workerService = ServiceLoader.load(WorkerService.class);
-        workerService.forEach(service -> workerMap.put(service.getWorkerID(), service));
+        workerService.forEach(service -> workerMap.put(service.getWorkerType(), service));
 
         CommandLine.run(new WorkerManager(), System.out, args);
     }

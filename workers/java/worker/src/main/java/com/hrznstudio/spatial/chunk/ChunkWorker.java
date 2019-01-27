@@ -1,6 +1,6 @@
 package com.hrznstudio.spatial.chunk;
 
-import com.hrznstudio.spatial.WorkerService;
+import com.hrznstudio.spatial.BaseWorker;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.EntityBuilder;
 import improbable.Coordinates;
@@ -13,33 +13,21 @@ import minecraft.world.Block;
 import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
 import minecraft.world.State;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
-public class ChunkWorker implements WorkerService {
+public final class ChunkWorker extends BaseWorker.BaseViewWorker {
     private static final String CHUNK = "chunk";
-
-    private final UUID uuid = UUID.randomUUID();
-    private final String name = getClass().getSimpleName() + "$" + uuid;
-    private final Logger logger = LogManager.getLogger(name);
     private static final Block block = new Block("minecraft:stone");
-    private final Map<Integer, State> tmpChunk;
     private static final WorkerRequirementSet CHUNK_REQUIREMENT_SET = new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("chunk_worker"))));
+    private final Map<Integer, State> tmpChunk;
 
     {
         tmpChunk = new LinkedHashMap<>();
         for (int i = 0; i < 16; i++)
             for (int j = 0; j < 16; j++) tmpChunk.put(getIDForPos(i, 1, j), new State(block, 0));
-    }
-
-    @Override
-    public String getWorkerID() {
-        return "ChunkWorker";
     }
 
     private void createChunk(Dispatcher dispatcher, Connection connection, Coordinates position) {
@@ -64,15 +52,7 @@ public class ChunkWorker implements WorkerService {
     }
 
     @Override
-    public void start() {
-        logger.info("Starting to connect");
-        ConnectionManager.connect(name, true);
-        ConnectionManager.setConnectionCallback(this::onConnected);
-    }
-
-    private void onConnected() {
-        logger.info("Connection status: " + ConnectionManager.getConnectionStatus());
-        System.out.println();
+    protected void onConnected() {
         createChunk(ConnectionManager.getDispatcher(), ConnectionManager.getConnection(), new Coordinates(0, 0, 0));
     }
 }

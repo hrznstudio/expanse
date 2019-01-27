@@ -1,6 +1,6 @@
 package com.hrznstudio.spatial.client.vanillawrappers;
 
-import com.hrznstudio.spatial.client.ClientWorker;
+import com.hrznstudio.spatial.client.HorizonClientWorker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.concurrent.Future;
@@ -15,10 +15,10 @@ import java.net.SocketAddress;
 
 @MethodsReturnNonnullByDefault
 public class SpatialNetworkManager extends NetworkManager {
-    private final ClientWorker clientWorker;
+    private final HorizonClientWorker clientWorker;
     private Logger logger = LogManager.getLogger();
 
-    public SpatialNetworkManager(ClientWorker clientWorker) {
+    public SpatialNetworkManager(HorizonClientWorker clientWorker) {
         super(EnumPacketDirection.CLIENTBOUND);
         this.clientWorker = clientWorker;
         channel = new EmbeddedChannel();

@@ -27,7 +27,7 @@ public class WorldClientSpatial extends WorldClient {
 
     @Override
     public IBlockState getBlockState(final BlockPos pos) {
-        final ClientView view = SpatialMod.getClientWorker().getView();
+        final ClientView view = SpatialMod.getClientWorker().getDispatcher();
         if (view == null) return Blocks.AIR.getDefaultState();
         final ChunkStorageData chunk = view.getChunkFromBlock(pos);
         if (chunk == null) return Blocks.AIR.getDefaultState();
