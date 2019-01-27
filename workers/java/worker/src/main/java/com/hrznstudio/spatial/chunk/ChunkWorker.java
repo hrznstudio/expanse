@@ -48,7 +48,7 @@ public final class ChunkWorker extends BaseWorker.BaseViewWorker {
     }
 
     private int getIDForPos(int x, int y, int z) {
-        return x << 4 + y << 2 + z;
+        return (x << 8) + (y << 4) + z;
     }
 
     @Override

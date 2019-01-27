@@ -4,8 +4,13 @@ import com.hrznstudio.spatial.BaseWorker;
 import com.hrznstudio.spatial.client.vanillawrappers.SpatialNetworkManager;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.ConnectionStatus;
-import improbable.worker.EntityId;
-import improbable.worker.Ops;
+import com.hrznstudio.spatial.util.EntityBuilder;
+import improbable.Coordinates;
+import improbable.Position;
+import improbable.WorkerAttributeSet;
+import improbable.WorkerRequirementSet;
+import improbable.collections.Option;
+import improbable.worker.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -57,6 +62,24 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
 
     @Override
     protected void onConnected() {
+        Connection connection = ConnectionManager.getConnection();
+        Dispatcher dispatcher = getDispatcher();
+        final Option<Integer> timeoutMillis = Option.of(500);
+
+        // Reserve an entity ID.
+        RequestId<ReserveEntityIdsRequest> entityIdReservationRequestId = connection.sendReserveEntityIdsRequest(1, timeoutMillis);
+        // When the reservation succeeds, create an entity with the reserved ID.
+
+        dispatcher.onReserveEntityIdsResponse(op -> {
+            if (op.requestId.equals(entityIdReservationRequestId) && op.statusCode == StatusCode.SUCCESS) {
+                EntityBuilder builder = new EntityBuilder("player");
+                builder.addComponent(Position.COMPONENT, new improbable.PositionData(new Coordinates(5, 2, 5)), // TODO: use position from server
+                        new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
+                );
+                connection.sendCreateEntityRequest(builder.build(), op.firstEntityId, timeoutMillis);
+            }
+        });
+
         Minecraft mc = Minecraft.getMinecraft();
         networkManager = new SpatialNetworkManager(this);
         netHandlerPlayClient = new NetHandlerPlayClient(mc, guiMainMenu, networkManager, mc.getSession().getProfile());
@@ -75,8 +98,8 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
                     false
             ));
             netHandlerPlayClient.handlePlayerPosLook(new SPacketPlayerPosLook(
-                    0, 3, 0, 0, 0, Collections.emptySet(), -1
-            ));
+                    5, 2, 5, 0, 0, Collections.emptySet(), -1
+            )); // TODO: use position from server
         });
     }
 
@@ -85,5 +108,6 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         super.onDisConnected(reason);
         WorldClient wc = Minecraft.getMinecraft().world;
         if (wc != null) wc.sendQuittingDisconnectingPacket();
+        // TODO: remove player entity
     }
 }

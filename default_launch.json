@@ -1,32 +1,52 @@
 {
-    "template": "small_entity_db_v2",
-    "world": {
-      "chunkEdgeLengthMeters": 50,
-      "snapshots": {
-        "snapshotWritePeriodSeconds": 0
-      },
-      "dimensions": {
-        "xMeters": 1500,
-        "zMeters": 1500
-      }
+  "template": "small_entity_db_v2",
+  "world": {
+    "chunkEdgeLengthMeters": 50,
+    "snapshots": {
+      "snapshotWritePeriodSeconds": 0
     },
-    "workers": [
+    "dimensions": {
+      "xMeters": 1500,
+      "zMeters": 1500
+    }
+  },
+  "load_balancing": {
+    "layer_configurations": [
       {
-        "worker_type": "HorizonJavaWorker",
-        "permissions": [{
-          "all": {}
-        }]
-      },{
-        "worker_type": "ChunkWorker",
-        "permissions": [{
-          "all": {}
-        }]
-      },
-      {
-        "worker_type": "HorizonClientWorker",
-        "permissions": [{
-          "all": {}
-        }]
+        "layer": "chunk_worker",
+        "hex_grid": {
+          "num_workers": 1
+        },
+        "options": {
+          "manual_worker_connection_only": true
+        }
       }
     ]
-  }
+  },
+  "workers": [
+    {
+      "worker_type": "HorizonJavaWorker",
+      "permissions": [
+        {
+          "all": {}
+        }
+      ]
+    },
+    {
+      "worker_type": "ChunkWorker",
+      "permissions": [
+        {
+          "all": {}
+        }
+      ]
+    },
+    {
+      "worker_type": "HorizonClientWorker",
+      "permissions": [
+        {
+          "all": {}
+        }
+      ]
+    }
+  ]
+}

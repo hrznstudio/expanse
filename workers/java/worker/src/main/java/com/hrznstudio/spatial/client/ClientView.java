@@ -47,6 +47,6 @@ public class ClientView extends View {
      * @return chunk at given position
      */
     public ChunkStorageData getChunkFromBlock(final BlockPos pos) {
-        return getChunk(new BlockPos(pos.getX() >> 16, pos.getY() >> 16, pos.getZ() >> 16));
+        return getChunk(new BlockPos(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
     }
 }
