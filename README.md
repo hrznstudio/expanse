@@ -3,12 +3,12 @@
 # Horizon Expanse
 
 [![Discord](https://img.shields.io/discord/422424112863117312.svg?style=for-the-badge&logo=discord)](https://discord.gg/758eCD7)
-![](https://img.shields.io/github/contributors/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)
-![](https://img.shields.io/github/issues/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)
-![](https://img.shields.io/github/issues-pr/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)
-![](https://img.shields.io/github/forks/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)
-![](https://img.shields.io/github/stars/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)
-![](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+[![](https://img.shields.io/github/contributors/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/graphs/contributors)
+[![](https://img.shields.io/github/issues/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/issues)
+[![](https://img.shields.io/github/issues-pr/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/pulls)
+[![](https://img.shields.io/github/forks/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/network/members)
+[![](https://img.shields.io/github/stars/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/stargazers)
+[![](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/HRZNStudio/Expanse/blob/master/LICENSE)
 
 ## What is it?
 Expanse is a project which aims to completely replace minecraft's networking internals with SpatialOS to allow infinite worlds with near infinite people.
