@@ -16,6 +16,7 @@ Expanse is a project which aims to completely replace minecraft's networking int
 ## How does it work?
 
 The traditional ways to develop large online games mean that you’re either limited by the capacity of a single game server, or you have to shard your game world.
+
 ![alt tag](docs/trad-client-server.png)
 
 SpatialOS works differently: it brings together many servers so they’re working as one. But it does this in a way that makes a single world which looks seamless to players.
