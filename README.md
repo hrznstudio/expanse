@@ -19,6 +19,7 @@ The traditional ways to develop large online games mean that you’re either lim
 ![alt tag](docs/trad-client-server.png)
 SpatialOS works differently: it brings together many servers so they’re working as one. But it does this in a way that makes a single world which looks seamless to players.
 ![alt tag](docs/deployment.png)
+[<sup>Images from SpatialOS documentation</sup>](https://docs.improbable.io/reference/13.5/shared/concepts/spatialos)
 
 ## How can I contribute? [![Open Source Helpers](https://www.codetriage.com/hrznstudio/spatial/badges/users.svg)](https://www.codetriage.com/hrznstudio/spatial)
 
