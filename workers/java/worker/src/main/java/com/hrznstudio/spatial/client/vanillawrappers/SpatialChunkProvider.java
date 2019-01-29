@@ -14,6 +14,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
 
@@ -44,22 +45,11 @@ public class SpatialChunkProvider extends ChunkProviderClient {
 
     @Override
     public boolean tick() {
-        long i = System.currentTimeMillis();
-        ObjectIterator objectiterator = this.loadedChunks.values().iterator();
-
-        while (objectiterator.hasNext()) {
-            Chunk chunk = (Chunk) objectiterator.next();
-            chunk.onTick(System.currentTimeMillis() - i > 5L);
-        }
-
-        if (System.currentTimeMillis() - i > 100L) {
-            //LOGGER.info("Warning: Clientside chunk ticking took {} ms", (long)(System.currentTimeMillis() - i));
-        }
-
-        return false;
+        return super.tick();
     }
 
     @Override
+    @Nonnull
     public String makeString() {
         return "SpatialChunkProvider: " + this.loadedChunks.size() + ", " + this.loadedChunks.size();
     }
@@ -71,22 +61,18 @@ public class SpatialChunkProvider extends ChunkProviderClient {
 
     public void setChunk(BlockPos pos, ChunkStorageData chunkStorageData) {
         SpatialChunk chunk = getLoadedChunk(pos.getX(), pos.getZ());
-        if (chunk != null) {
-            chunkStorageData.getBlocks().forEach(new BiConsumer<Integer, State>() {
-                @Override
-                public void accept(Integer integer, State state) {
-                        chunk.setBlockState(new BlockPos((integer >> 8) % 16, (integer >> 4) % 16, integer % 16), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta()));
-                }
-            });
-        } else {
-            SpatialChunk spatialChunk = new SpatialChunk(world, new SpatialPrimer(), pos.getX(), pos.getZ());
-            chunkStorageData.getBlocks().forEach(new BiConsumer<Integer, State>() {
-                @Override
-                public void accept(Integer integer, State state) {
-                    spatialChunk.setBlockState(new BlockPos((integer >> 8) % 16, (integer >> 4) % 16, integer % 16), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta()));
-                }
-            });
-            loadedChunks.put(ChunkPos.asLong(spatialChunk.x, spatialChunk.z), spatialChunk);
+        if (chunk == null) {
+            chunk = new SpatialChunk(world, new SpatialPrimer(), pos.getX(), pos.getZ());
+            loadedChunks.put(ChunkPos.asLong(chunk.x, chunk.z), chunk);
         }
+        SpatialChunk finalChunk = chunk;
+        chunkStorageData.getBlocks().forEach(new BiConsumer<Integer, State>() {
+            @Override
+            public void accept(Integer integer, State state) {
+                finalChunk.setBlockState(new BlockPos((integer >> 8) % 16, (integer >> 4) % 16, integer % 16), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta()));
+            }
+        });
+        chunk.getHeightMap();
+        chunk.generateSkylightMap();
     }
 }

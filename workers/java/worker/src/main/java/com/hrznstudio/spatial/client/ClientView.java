@@ -19,23 +19,19 @@ public class ClientView extends View {
     private final BiMap<EntityId, BlockPos> idToPosChunks = posToIdChunks.inverse();
 
     public ClientView() {
-        super();
-
-        //TODO: this all needs to detect whether the entitiy is actually a chunk
-        this.onRemoveEntity(op -> idToPosChunks.remove(op.entityId));
-        this.onAddComponent(Position.COMPONENT, op -> posToIdChunks.put(Converters.improbableToBlockPos(op.data), op.entityId));
+        //TODO: this all needs to detect whether the entity is actually a chunk
+        this.onRemoveEntity(op -> removeChunk(op.entityId));
+        this.onAddComponent(Position.COMPONENT, op -> addChunk(Converters.improbableToBlockPos(op.data), op.entityId));
     }
 
     public void removeChunk(EntityId chunk) {
-        if (idToPosChunks.containsKey(chunk)) {
-            posToIdChunks.remove(idToPosChunks.get(chunk));
-            idToPosChunks.remove(chunk);
-        }
+        idToPosChunks.remove(chunk);
+        //TODO: update render cache
     }
 
     public void addChunk(BlockPos pos, EntityId chunk) {
-        idToPosChunks.put(chunk, pos);
         posToIdChunks.put(pos, chunk);
+        //TODO: update render cache
     }
 
     /**
