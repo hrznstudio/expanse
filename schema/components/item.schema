@@ -1,5 +1,7 @@
 package minecraft.item;
 
+// Reserves 1100-1199
+
 type Item {
   string id = 1;
 }
