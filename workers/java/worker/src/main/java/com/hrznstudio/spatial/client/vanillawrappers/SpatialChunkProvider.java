@@ -3,7 +3,6 @@ package com.hrznstudio.spatial.client.vanillawrappers;
 import com.google.common.base.MoreObjects;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import minecraft.world.ChunkStorageData;
 import minecraft.world.State;
 import net.minecraft.block.Block;
@@ -60,6 +59,7 @@ public class SpatialChunkProvider extends ChunkProviderClient {
     }
 
     public void setChunk(BlockPos pos, ChunkStorageData chunkStorageData) {
+
         SpatialChunk chunk = getLoadedChunk(pos.getX(), pos.getZ());
         if (chunk == null) {
             chunk = new SpatialChunk(world, new SpatialPrimer(), pos.getX(), pos.getZ());
@@ -69,7 +69,7 @@ public class SpatialChunkProvider extends ChunkProviderClient {
         chunkStorageData.getBlocks().forEach(new BiConsumer<Integer, State>() {
             @Override
             public void accept(Integer integer, State state) {
-                finalChunk.setBlockState(new BlockPos((integer >> 8) % 16, (integer >> 4) % 16, integer % 16), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta()));
+                finalChunk.setBlockState(new BlockPos((integer >> 8) % 16, pos.getY() + (integer >> 4) % 16, integer % 16), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta()));
             }
         });
         chunk.getHeightMap();
