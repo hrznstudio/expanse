@@ -1,7 +1,9 @@
+import net.minecraftforge.gradle.patcher.PatcherConstants
+
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://repo.spongepowered.org/maven"    }
+        maven { url = "http://repo.spongepowered.org/maven" }
         maven { url = "https://files.minecraftforge.net/maven" }
     }
     dependencies {
@@ -48,6 +50,37 @@ dependencies {
     }
     compile 'org.javassist:javassist:3.21.0-GA'
     compile project(':worker-sdk')
+    compile project('patcherdummy')
+}
+
+jar {
+    with copySpec {
+        from{
+            (configurations.forgeGradleMc.resolvedConfiguration.resolvedArtifacts
+                    + configurations.forgeGradleMcDeps.resolvedConfiguration.resolvedArtifacts
+//                + configurations.forgeGradleMcDepsClient.resolvedConfiguration.resolvedArtifacts
+//                + configurations.forgeGradleMcNatives.resolvedConfiguration.resolvedArtifacts
+//                + configurations.forgeGradleUserDevPackage.resolvedConfiguration.resolvedArtifacts
+                    + configurations.compile.resolvedConfiguration.resolvedArtifacts
+            ).collect {
+                logger.info("Copying ${it.file} for config $it")
+                it.file.isDirectory() ? it.file : zipTree(it.file)
+            }
+        }
+        exclude '**/META-INF/services/**'
+        exclude '**/META-INF/*.SF'
+        exclude '**/META-INF/*.DSA'
+        exclude '**/META-INF/*.RSA'
+    }
+
+    manifest {
+        attributes([
+                'Main-Class': gradle.ext.mainClass,
+                'FMLAT'         : 'spatial_at.cfg',
+                'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}",
+                'Timestamp'     : System.currentTimeMillis()
+        ])
+    }
 }
 
 processResources {

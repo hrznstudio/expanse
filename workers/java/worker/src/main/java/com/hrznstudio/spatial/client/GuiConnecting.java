@@ -1,29 +1,19 @@
 package com.hrznstudio.spatial.client;
 
-import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.SpatialMod;
 import net.minecraft.client.gui.GuiScreen;
 
-public class GuiConnecting extends GuiScreen {
-    public GuiConnecting() {
-        ConnectionManager.connect();
-    }
+public class GuiConnecting extends GuiScreen { // TODO: add a cancel button to call `SpatialMod.getClientWorker().stop();`
 
-    @Override
-    public void updateScreen() {
-        super.updateScreen();
-        if(ConnectionManager.getConnectionStatus().isConnected()) {
-            SpatialMod.getClientWorker().initializeConnection();
-        } else if(ConnectionManager.hasConnectionFinished() || ConnectionManager.getConnectionStatus().isFailure()) {
-            SpatialMod.getClientWorker().onConnectionFailure();
-        }
+    public GuiConnecting() {
+        SpatialMod.getClientWorker().start();
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
-        switch (ConnectionManager.getConnectionStatus()) {
+        switch (SpatialMod.getClientWorker().getConnectionStatus()) {
             case CONNECTED:
                 drawCenteredString(fontRenderer, "Connected to SpatialOS", width / 2, height / 2, -1);
                 return;
@@ -33,7 +23,6 @@ public class GuiConnecting extends GuiScreen {
             default:
             case DISCONNECTED:
                 drawCenteredString(fontRenderer, "Connection to SpatialOS Failed", width / 2, height / 2, -1);
-                return;
         }
     }
 }

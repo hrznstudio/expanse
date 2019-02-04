@@ -1,7 +1,7 @@
 package com.hrznstudio.spatial;
 
-import com.hrznstudio.spatial.client.ClientWorker;
 import com.hrznstudio.spatial.client.GuiConnecting;
+import com.hrznstudio.spatial.client.HorizonClientWorker;
 import com.hrznstudio.spatial.util.CommonWorkerRequirements;
 import com.hrznstudio.spatial.util.EntityBuilder;
 import improbable.Coordinates;
@@ -25,9 +25,9 @@ import java.util.UUID;
 @Mod.EventBusSubscriber
 public class SpatialMod {
 
-    private static ClientWorker worker = new ClientWorker();
+    private static HorizonClientWorker worker = new HorizonClientWorker();
 
-    public static ClientWorker getClientWorker() {
+    public static HorizonClientWorker getClientWorker() {
         return worker;
     }
 

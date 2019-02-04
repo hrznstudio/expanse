@@ -1,20 +1,25 @@
 package com.hrznstudio.spatial.util;
 
 import improbable.worker.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.UUID;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ConnectionManager {
-    private static ScheduledThreadPoolExecutor asyncExecutor = new ScheduledThreadPoolExecutor(1);
-    private static ScheduledFuture future;
+    // Having this be a fixed thread pool serves as keep-alive until the event loop kicks in
+    private static ExecutorService loginPool = Executors.newFixedThreadPool(1);
+    // Using a stealing pool with a parallelism of 1 makes this behave similarly to Actors
+    private static ExecutorService processingPool = Executors.newWorkStealingPool(1);
+    private static Future future;
     private static Connection connection;
-    private static boolean isConnected;
-    private static Dispatcher dispatcher;
-    private static EntityId playerId;
+    private static final Logger logger = LogManager.getLogger(ConnectionManager.class.getSimpleName());
     private static ConnectionStatus connectionStatus = ConnectionStatus.DISCONNECTED;
+    private static Dispatcher dispatcher;
+    private static Runnable connectionCallback = null;
 
     public static Connection getConnection() {
         return connection;
@@ -24,58 +29,62 @@ public class ConnectionManager {
         return dispatcher;
     }
 
-    public static EntityId getPlayerId() {
-        return playerId;
-    }
-
     public static ConnectionStatus getConnectionStatus() {
         return connectionStatus;
+    }
+
+    public static void disconnect() {
+        if (future != null && !future.isDone()) future.cancel(true);
+        connectionStatus = ConnectionStatus.DISCONNECTED;
+        try {
+            connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        dispatcher = null;
     }
 
     public static boolean hasConnectionFinished() {
         return future.isDone();
     }
 
-    public static void connect() {
-        future = asyncExecutor.schedule(()-> {
-            connection = getConnection("HorizonClientWorker" + UUID.randomUUID(), "localhost", 22000);
-            isConnected = connection.isConnected();
+    public static void connect(final String workerName, final String workerType, final Dispatcher dispatcher) {
+        if (future != null && !future.isDone() && dispatcher != ConnectionManager.dispatcher) future.cancel(true);
+        if (future == null || future.isDone()) {
+            future = loginPool.submit(() -> {
+                connection = getConnection(workerName, workerType, "localhost", 22000);
+                connectionStatus = connection.isConnected() ? ConnectionStatus.CONNECTED : ConnectionStatus.FAILED;
 
-            if (isConnected) {
-                System.out.println("Successfully connected to SpatialOS");
-                connectionStatus = ConnectionStatus.CONNECTED;
-                dispatcher = new Dispatcher();
-            } else {
-                connectionStatus = ConnectionStatus.FAILED;
-                System.out.println("Failed to connect to SpatialOS");
-                return;
-            }
-
-            new Thread(ConnectionManager::runEventLoop).start();
-
-            dispatcher.onCreateEntityResponse(new Callback<Ops.CreateEntityResponse>() {
-                @Override
-                public void call(Ops.CreateEntityResponse argument) {
-                    if (argument.statusCode == StatusCode.SUCCESS) {
-                        playerId = argument.entityId.get();
-                    }
+                if (isConnected()) {
+                    logger.info("Successfully connected to SpatialOS");
+                    ConnectionManager.dispatcher = dispatcher;
+                    dispatcher.onDisconnect(dc -> {
+                        logger.info("Disconnected from SpatialOS");
+                        connectionStatus = ConnectionStatus.DISCONNECTED;
+                    });
+                    if (connectionCallback != null) connectionCallback.run();
+                } else {
+                    logger.info("Failed to connect to SpatialOS");
+                    return;
                 }
+
+                new Thread(ConnectionManager::runEventLoop).start();
             });
-            dispatcher.onDisconnect(new Callback<Ops.Disconnect>() {
-                @Override
-                public void call(Ops.Disconnect argument) {
-                    connectionStatus = ConnectionStatus.DISCONNECTED;
-                    //TODO: trigger an event or smth
-                }
-            });
-        }, 0, TimeUnit.SECONDS);
+        }
     }
 
+    public static void connect(final String workerName, final String workerType, final boolean useView) {
+        connect(workerName, workerType, useView ? new View() : new Dispatcher());
+    }
 
-    private static Connection getConnection(String workerId, String hostname, int port) {
+    public static void setConnectionCallback(Runnable connectionCallback) {
+        ConnectionManager.connectionCallback = connectionCallback;
+    }
+
+    private static Connection getConnection(final String workerId, final String workerType, final String hostname, final int port) {
         connectionStatus = ConnectionStatus.CONNECTING;
         ConnectionParameters parameters = new ConnectionParameters();
-        parameters.workerType = "HorizonClientWorker";
+        parameters.workerType = workerType;
         parameters.network = new NetworkParameters();
         parameters.network.connectionType = NetworkConnectionType.Tcp;
         parameters.network.useExternalIp = false;
@@ -87,10 +96,10 @@ public class ConnectionManager {
 
     private static void runEventLoop() {
         java.time.Duration maxWait = java.time.Duration.ofMillis(Math.round(1000.0 / UPDATES_PER_SECOND));
-        while (isConnected) {
+        while (isConnected()) {
             long startTime = System.nanoTime();
             OpList opList = connection.getOpList(0);
-            dispatcher.process(opList);
+            processingPool.submit(() -> dispatcher.process(opList));
 
             long stopTime = System.nanoTime();
             java.time.Duration waitFor = maxWait.minusNanos(stopTime - startTime);
@@ -101,5 +110,9 @@ public class ConnectionManager {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static boolean isConnected() {
+        return connectionStatus.isConnected();
     }
 }

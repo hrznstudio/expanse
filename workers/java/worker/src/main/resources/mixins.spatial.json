@@ -9,6 +9,7 @@
     "MixinPackageScanner"
   ],
   "client": [
-    "MixinEntityPlayerSP"
+    "MixinEntityPlayerSP",
+    "MixinNetHandlerPlayClient"
   ]
 }

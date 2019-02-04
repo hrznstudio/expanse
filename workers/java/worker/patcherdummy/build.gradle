@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'de.undercouch.download' version '3.4.3'
+}
+apply plugin: 'net.minecraftforge.gradle.patcher'
+
+minecraft.version = "1.12.2"
+
+minecraft {
+    mappings = "stable_39"
+    workspaceDir = "tmp"
+
+    download {
+        def base = "https://raw.githubusercontent.com/MinecraftForge/MinecraftForge/1.12.x/jsons/${minecraft.version}"
+        src(["${base}.json", "$base-dev.json", "$base-rel.json"])
+        dest 'jsons/'
+        onlyIfModified true
+        overwrite true
+    }
+    versionJson = "jsons/${minecraft.version}-dev.json"
+
+    projects {
+        spatial {}
+    }
+}
+
+processJson {
+    releaseJson = "jsons/${minecraft.version}-rel.json"
+    addReplacements([
+            "@minecraft_version@": project.minecraft.version,
+            "@version@"          : project.version,
+            "@project@"          : project.archivesBaseName,
+            "@artifact@"         : "${project.group}:${project.archivesBaseName}:${project.version}",
+            "@universal_jar@"    : { "NAN" },
+            "@timestamp@"        : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+    ])
+}
+
+jar {
+    dependsOn compressDeobf
+    from compressDeobf.outputs.files.files
+}

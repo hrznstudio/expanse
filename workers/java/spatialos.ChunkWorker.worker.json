@@ -10,13 +10,45 @@
     },
     "entity_interest": {
       "range_entity_interest": {
-        "radius": 2
+        "radius": 10
       }
     },
     "streaming_query": [],
     "component_delivery": {
       "default": "RELIABLE_ORDERED",
       "checkout_all_initially": true
+    }
+  },
+  "external": {
+    "default": {
+      "run_type": "EXECUTABLE_ZIP",
+      "linux": {
+        "artifact_name": "HorizonJavaWorker@Linux.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "HorizonJavaWorker.jar",
+          "ChunkWorker"
+        ]
+      },
+      "windows": {
+        "artifact_name": "HorizonJavaWorker@Windows.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "HorizonJavaWorker.jar",
+          "ChunkWorker"
+        ]
+      },
+      "macos": {
+        "artifact_name": "HorizonJavaWorker@Mac.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "HorizonJavaWorker.jar",
+          "ChunkWorker"
+        ]
+      }
     }
   }
 }
