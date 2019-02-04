@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketJoinGame;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class HorizonClientWorker extends BaseWorker<ClientView> {
     private EntityId playerId;
@@ -70,13 +72,19 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         RequestId<ReserveEntityIdsRequest> entityIdReservationRequestId = connection.sendReserveEntityIdsRequest(1, timeoutMillis);
         // When the reservation succeeds, create an entity with the reserved ID.
 
+        AtomicReference<RequestId<CreateEntityRequest>> createEntityRequestRequestId = new AtomicReference<>();
         dispatcher.onReserveEntityIdsResponse(op -> {
             if (op.requestId.equals(entityIdReservationRequestId) && op.statusCode == StatusCode.SUCCESS) {
                 EntityBuilder builder = new EntityBuilder("Player");
                 builder.addComponent(Position.COMPONENT, new improbable.PositionData(new Coordinates(5, 200, 5)), // TODO: use position from server
                         new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
                 );
-                connection.sendCreateEntityRequest(builder.build(), op.firstEntityId, timeoutMillis);
+                createEntityRequestRequestId.set(connection.sendCreateEntityRequest(builder.build(), op.firstEntityId, timeoutMillis));
+            }
+        });
+        dispatcher.onCreateEntityResponse(argument -> {
+            if (argument.requestId.equals(createEntityRequestRequestId.get()) && argument.statusCode == StatusCode.SUCCESS) {
+                playerId = argument.entityId.get();
             }
         });
 
