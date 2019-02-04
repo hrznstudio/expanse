@@ -6,8 +6,8 @@
       "snapshotWritePeriodSeconds": 0
     },
     "dimensions": {
-      "xMeters": 1500,
-      "zMeters": 1500
+      "xMeters": 1600,
+      "zMeters": 1600
     }
   },
   "load_balancing": {
