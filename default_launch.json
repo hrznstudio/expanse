@@ -1,7 +1,7 @@
 {
-  "template": "small_entity_db_v2",
+  "template": "small",
   "world": {
-    "chunkEdgeLengthMeters": 50,
+    "chunkEdgeLengthMeters": 16,
     "snapshots": {
       "snapshotWritePeriodSeconds": 0
     },
