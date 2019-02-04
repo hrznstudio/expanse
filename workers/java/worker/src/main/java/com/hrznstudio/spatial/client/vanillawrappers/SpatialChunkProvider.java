@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -13,16 +12,6 @@ public class SpatialChunkProvider extends ChunkProviderClient {
 
     public SpatialChunkProvider(World worldIn) {
         super(worldIn);
-    }
-
-    @Override
-    public Chunk loadChunk(int chunkX, int chunkZ) {
-//        Chunk chunk = new SpatialChunk(this.world, new SpatialPrimer(), chunkX, chunkZ);
-        Chunk chunk = new Chunk(this.world, chunkX, chunkZ);
-        this.loadedChunks.put(ChunkPos.asLong(chunkX, chunkZ), chunk);
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.ChunkEvent.Load(chunk));
-        chunk.markLoaded(true);
-        return chunk;
     }
 
     @Override
@@ -34,7 +23,11 @@ public class SpatialChunkProvider extends ChunkProviderClient {
         Chunk chunk = getLoadedChunk(chunkPos.getX(), chunkPos.getZ());
         if (chunk == null) chunk = loadChunk(chunkPos.getX(), chunkPos.getZ());
         final Chunk finalChunk = chunk;
-        chunkStorageData.getBlocks().forEach((integer, state) -> finalChunk.setBlockState(new BlockPos((integer >> 8) % 16, chunkPos.getY() + (integer >> 4) % 16, integer % 16), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta())));
+        //noinspection deprecation
+        chunkStorageData.getBlocks().forEach((integer, state) -> finalChunk.setBlockState(
+                new BlockPos((integer >> 8) % 16, chunkPos.getY() + (integer >> 4) % 16, integer % 16),
+                Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta()))
+        );
         chunk.getHeightMap();
         chunk.generateSkylightMap();
     }
