@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class ChunkWorker extends BaseWorker.BaseViewWorker {
-    private static final String CHUNK = "chunk";
+    public static final String CHUNK = "chunk";
     private static final Block block = new Block("minecraft:stone");
     private static final WorkerRequirementSet CHUNK_REQUIREMENT_SET = new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("chunk_worker"))));
     private final Map<Integer, State> tmpChunk;

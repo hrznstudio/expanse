@@ -16,6 +16,14 @@ public abstract class Converters {
         return new BlockPos(position.getX(), position.getY(), position.getZ());
     }
 
+    public static BlockPos improbableToChunkPos(final PositionData position) {
+        return improbableToChunkPos(position.getCoords());
+    }
+
+    public static BlockPos improbableToChunkPos(final Coordinates position) {
+        return new BlockPos((int) position.getX() >> 4, (int) position.getY() >> 4, (int) position.getZ() >> 4);
+    }
+
     public static int blockPosToChunkIndex(final BlockPos position) {
         return blockPosToChunkIndex(position.getX(), position.getY(), position.getZ());
     }

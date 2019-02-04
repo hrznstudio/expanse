@@ -1,11 +1,10 @@
 package com.hrznstudio.spatial.client;
 
-import com.hrznstudio.spatial.client.vanillawrappers.WorldClientSpatial;
-import com.hrznstudio.spatial.worker.BaseWorker;
 import com.hrznstudio.spatial.client.vanillawrappers.SpatialNetworkManager;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.ConnectionStatus;
 import com.hrznstudio.spatial.util.EntityBuilder;
+import com.hrznstudio.spatial.worker.BaseWorker;
 import improbable.Coordinates;
 import improbable.Position;
 import improbable.WorkerAttributeSet;
@@ -19,7 +18,6 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketJoinGame;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldType;
@@ -75,7 +73,7 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         dispatcher.onReserveEntityIdsResponse(op -> {
             if (op.requestId.equals(entityIdReservationRequestId) && op.statusCode == StatusCode.SUCCESS) {
                 EntityBuilder builder = new EntityBuilder("Player");
-                builder.addComponent(Position.COMPONENT, new improbable.PositionData(new Coordinates(5, 2, 5)), // TODO: use position from server
+                builder.addComponent(Position.COMPONENT, new improbable.PositionData(new Coordinates(5, 200, 5)), // TODO: use position from server
                         new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
                 );
                 connection.sendCreateEntityRequest(builder.build(), op.firstEntityId, timeoutMillis);
@@ -100,10 +98,8 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
                     false
             ));
             netHandlerPlayClient.handlePlayerPosLook(new SPacketPlayerPosLook(
-                    5, 2, 5, 0, 0, Collections.emptySet(), -1
+                    5, 60, 5, 0, 0, Collections.emptySet(), -1
             )); // TODO: use position from server
-
-            ((WorldClientSpatial)mc.world).refreshChunks();
         });
     }
 

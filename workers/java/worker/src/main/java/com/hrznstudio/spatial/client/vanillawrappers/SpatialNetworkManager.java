@@ -5,7 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.network.*;
 import net.minecraft.util.text.ITextComponent;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.SocketAddress;
 
-@MethodsReturnNonnullByDefault
 public class SpatialNetworkManager extends NetworkManager {
     private final HorizonClientWorker clientWorker;
     private Logger logger = LogManager.getLogger();

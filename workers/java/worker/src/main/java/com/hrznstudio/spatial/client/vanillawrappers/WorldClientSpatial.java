@@ -1,27 +1,15 @@
 package com.hrznstudio.spatial.client.vanillawrappers;
 
-import com.hrznstudio.spatial.SpatialMod;
-import com.hrznstudio.spatial.util.Converters;
-import improbable.Position;
-import improbable.PositionData;
-import improbable.collections.Option;
-import improbable.worker.Entity;
-import improbable.worker.EntityId;
-import mcp.MethodsReturnNonnullByDefault;
-import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.function.BiConsumer;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class WorldClientSpatial extends WorldClient {
 
     public WorldClientSpatial(NetHandlerPlayClient netHandler, WorldSettings settings, int dimension, EnumDifficulty difficulty, Profiler profilerIn) {
@@ -39,16 +27,21 @@ public class WorldClientSpatial extends WorldClient {
 
     }
 
-    public void refreshChunks() {
-        SpatialMod.getClientWorker().getDispatcher().entities.forEach(new BiConsumer<EntityId, Entity>() {
-            @Override
-            public void accept(EntityId entityId, Entity entity) {
-                Option<ChunkStorageData> dataOption = entity.get(ChunkStorage.COMPONENT);
-                Option<PositionData> positionOption = entity.get(Position.COMPONENT);
-                if(dataOption.isPresent()&&positionOption.isPresent()) {
-                    ((SpatialChunkProvider)chunkProvider).setChunk(Converters.improbableToBlockPos(positionOption.get()), dataOption.get());
-                }
-            }
+    public void loadChunk(final BlockPos chunkPos, final ChunkStorageData chunkData) {
+        System.out.println("Preparing to load chunk at " + chunkPos);
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            System.out.println("Loading chunk at " + chunkPos);
+            ((SpatialChunkProvider) chunkProvider).setChunk(chunkPos, chunkData);
+            markBlockRangeForRenderUpdate(chunkPos.getX() << 4, chunkPos.getY() << 4, chunkPos.getZ() << 4, (chunkPos.getX() << 4) + 15, (chunkPos.getY() << 4) + 15, (chunkPos.getZ() << 4) + 15);
+        });
+    }
+
+    public void unloadChunk(final BlockPos chunkPos) {
+        System.out.println("Preparing to unload chunk at " + chunkPos);
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            System.out.println("Unloading chunk at " + chunkPos);
+            ((SpatialChunkProvider) chunkProvider).unloadChunk(chunkPos.getX(), chunkPos.getZ());
+            markBlockRangeForRenderUpdate(chunkPos.getX() * 16, chunkPos.getY() << 4, chunkPos.getZ() << 4, (chunkPos.getX() << 4) + 15, (chunkPos.getY() << 4) + 15, chunkPos.getZ() * 16 + 15);
         });
     }
 }
