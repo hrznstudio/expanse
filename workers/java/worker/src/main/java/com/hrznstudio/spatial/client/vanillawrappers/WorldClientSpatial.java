@@ -31,8 +31,12 @@ public class WorldClientSpatial extends WorldClient {
         System.out.println("Preparing to load chunk at " + chunkPos);
         Minecraft.getMinecraft().addScheduledTask(() -> {
             System.out.println("Loading chunk at " + chunkPos);
-            ((SpatialChunkProvider) chunkProvider).setChunk(chunkPos, chunkData);
-            markBlockRangeForRenderUpdate(chunkPos.getX() << 4, chunkPos.getY() << 4, chunkPos.getZ() << 4, (chunkPos.getX() << 4) + 15, (chunkPos.getY() << 4) + 15, (chunkPos.getZ() << 4) + 15);
+            try {
+                ((SpatialChunkProvider) chunkProvider).setChunk(chunkPos, chunkData);
+                markBlockRangeForRenderUpdate(chunkPos.getX() << 4, chunkPos.getY() << 4, chunkPos.getZ() << 4, (chunkPos.getX() << 4) + 15, (chunkPos.getY() << 4) + 15, (chunkPos.getZ() << 4) + 15);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 

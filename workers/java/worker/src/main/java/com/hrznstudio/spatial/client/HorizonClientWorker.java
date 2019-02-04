@@ -1,6 +1,7 @@
 package com.hrznstudio.spatial.client;
 
 import com.hrznstudio.spatial.client.vanillawrappers.SpatialNetworkManager;
+import com.hrznstudio.spatial.api.ISpatialEntity;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.ConnectionStatus;
 import com.hrznstudio.spatial.util.EntityBuilder;
@@ -15,7 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketJoinGame;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
@@ -85,13 +85,28 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         dispatcher.onCreateEntityResponse(argument -> {
             if (argument.requestId.equals(createEntityRequestRequestId.get()) && argument.statusCode == StatusCode.SUCCESS) {
                 playerId = argument.entityId.get();
+                if (Minecraft.getMinecraft().player != null)
+                    ((ISpatialEntity) Minecraft.getMinecraft().player).setSpatialId(playerId);
             }
         });
 
+        dispatcher.onAddEntity(new Callback<Ops.AddEntity>() {
+            @Override
+            public void call(Ops.AddEntity argument) {
+                ((ClientView) dispatcher).entities.get(argument.entityId);
+            }
+        });
+        dispatcher.onRemoveEntity(new Callback<Ops.RemoveEntity>() {
+            @Override
+            public void call(Ops.RemoveEntity argument) {
+
+            }
+        });
         Minecraft mc = Minecraft.getMinecraft();
         networkManager = new SpatialNetworkManager(this);
         netHandlerPlayClient = new NetHandlerPlayClient(mc, guiMainMenu, networkManager, mc.getSession().getProfile());
         FMLClientHandler.instance().setPlayClient(netHandlerPlayClient);
+        networkManager.setNetHandler(netHandlerPlayClient);
         NetworkDispatcher.allocAndSet(networkManager);
 
         mc.addScheduledTask(() -> {

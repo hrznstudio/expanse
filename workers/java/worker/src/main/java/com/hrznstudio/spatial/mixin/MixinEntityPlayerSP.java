@@ -1,6 +1,6 @@
 package com.hrznstudio.spatial.mixin;
 
-import com.hrznstudio.spatial.SpatialMod;
+import com.hrznstudio.spatial.api.ISpatialEntity;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import improbable.Coordinates;
 import improbable.Position;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EntityPlayerSP.class)
-public class MixinEntityPlayerSP {
+public abstract class MixinEntityPlayerSP {
 
     @Shadow
     private int positionUpdateTicks;
@@ -42,12 +42,13 @@ public class MixinEntityPlayerSP {
     @Shadow
     private float lastReportedPitch;
 
+    @Shadow public abstract void sendPlayerAbilities();
+
     @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;onUpdateWalkingPlayer()V"))
     public void onUpdateWalkingPlayer(EntityPlayerSP playerSP) {
         if (ConnectionManager.getConnectionStatus().isConnected()) {
             boolean flag = playerSP.isSprinting();
-
-            EntityId id = SpatialMod.getClientWorker().getPlayerId();
+            EntityId id = ((ISpatialEntity)playerSP).getSpatialId();
             if (id == null) {
                 return;
             }

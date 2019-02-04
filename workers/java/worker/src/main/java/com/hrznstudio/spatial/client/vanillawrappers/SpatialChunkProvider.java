@@ -3,6 +3,7 @@ package com.hrznstudio.spatial.client.vanillawrappers;
 import minecraft.world.ChunkStorageData;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -33,7 +34,7 @@ public class SpatialChunkProvider extends ChunkProviderClient {
         Chunk chunk = getLoadedChunk(chunkPos.getX(), chunkPos.getZ());
         if (chunk == null) chunk = loadChunk(chunkPos.getX(), chunkPos.getZ());
         final Chunk finalChunk = chunk;
-        chunkStorageData.getBlocks().forEach((integer, state) -> finalChunk.setBlockState(new BlockPos(integer >> 8, chunkPos.getY() + (integer >> 4), integer), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta())));
+        chunkStorageData.getBlocks().forEach((integer, state) -> finalChunk.setBlockState(new BlockPos(integer >> 8, Math.min((chunkPos.getY()*16) + (integer >> 4), integer),255), Block.REGISTRY.getObject(new ResourceLocation(state.getBlock().getId())).getStateFromMeta(state.getMeta())));
         chunk.getHeightMap();
         chunk.generateSkylightMap();
     }
