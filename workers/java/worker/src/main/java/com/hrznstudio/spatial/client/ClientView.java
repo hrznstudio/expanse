@@ -18,6 +18,8 @@ import minecraft.world.ChunkStorageData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.chunk.NibbleArray;
+import net.minecraft.world.chunk.storage.NibbleArrayReader;
 
 public class ClientView extends View {
 
@@ -27,27 +29,30 @@ public class ClientView extends View {
 
     public ClientView() {
         this.onRemoveEntity(op -> removeChunk(op.entityId));
-        // TODO: abstract away some system to require several components and listen to all of them
-        // TODO: listen to chunk content updates
-        this.onAddComponent(Position.COMPONENT, op -> {
-            final BlockPos chunkPos = Converters.improbableToChunkPos(op.data);
-            final Option<MetadataData> meta = ClientView.this.entities.get(op.entityId).get(Metadata.COMPONENT);
+        new ComponentRequirement(this, id -> {
+            Entity entity = ClientView.this.entities.get(id);
+            final Option<PositionData> pos = entity.get(Position.COMPONENT);
+            if (!pos.isPresent())
+                return;
+            final BlockPos chunkPos = Converters.improbableToChunkPos(pos.get());
+            final Option<MetadataData> meta = entity.get(Metadata.COMPONENT);
             if (meta.isPresent() && meta.get().getEntityType().equals(ChunkWorker.CHUNK))
-                addChunk(chunkPos, op.entityId);
-            final Option<ChunkStorageData> storage = ClientView.this.entities.get(op.entityId).get(ChunkStorage.COMPONENT);
+                addChunk(chunkPos, id);
+            final Option<ChunkStorageData> storage = entity.get(ChunkStorage.COMPONENT);
             if (storage.isPresent())
                 ((WorldClientSpatial) Minecraft.getMinecraft().world).loadChunk(chunkPos, storage.get());
-        });
-        this.onAddComponent(Metadata.COMPONENT, op -> {
-            if (op.data.getEntityType().equals(ChunkWorker.CHUNK)) {
-                final Option<PositionData> pos = ClientView.this.entities.get(op.entityId).get(Position.COMPONENT);
-                if (pos.isPresent()) addChunk(Converters.improbableToChunkPos(pos.get()), op.entityId);
+        }, Position.COMPONENT, Metadata.COMPONENT, ChunkStorage.COMPONENT);
+        this.onComponentUpdate(ChunkStorage.COMPONENT, argument -> {
+            EntityId id = argument.entityId;
+            Entity entity = ClientView.this.entities.get(id);
+            final Option<PositionData> pos = entity.get(Position.COMPONENT);
+            if (!pos.isPresent())
+                return;
+            final BlockPos chunkPos = Converters.improbableToChunkPos(pos.get());
+            final Option<MetadataData> meta = entity.get(Metadata.COMPONENT);
+            if (meta.isPresent() && meta.get().getEntityType().equals(ChunkWorker.CHUNK)) {
+                //TODO: Change blocks based on update
             }
-        });
-        this.onAddComponent(ChunkStorage.COMPONENT, op -> {
-            final Option<PositionData> pos = ClientView.this.entities.get(op.entityId).get(Position.COMPONENT);
-            if (pos.isPresent())
-                ((WorldClientSpatial) Minecraft.getMinecraft().world).loadChunk(Converters.improbableToChunkPos(pos.get()), op.data);
         });
     }
 

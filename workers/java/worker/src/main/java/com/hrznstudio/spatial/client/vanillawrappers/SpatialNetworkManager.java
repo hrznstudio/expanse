@@ -23,7 +23,7 @@ public class SpatialNetworkManager extends NetworkManager {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext p_channelActive_1_) throws Exception {
+    public void channelActive(ChannelHandlerContext p_channelActive_1_) {
         logger.info(() -> "SpatialNetworkManager#channelActive not implemented");
     }
 
@@ -33,17 +33,17 @@ public class SpatialNetworkManager extends NetworkManager {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext p_channelInactive_1_) throws Exception {
+    public void channelInactive(ChannelHandlerContext p_channelInactive_1_) {
         logger.info(() -> "SpatialNetworkManager#channelInactive not implemented");
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext p_exceptionCaught_1_, Throwable p_exceptionCaught_2_) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext p_exceptionCaught_1_, Throwable p_exceptionCaught_2_) {
         logger.info(() -> "SpatialNetworkManager#exceptionCaught not implemented");
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext p_channelRead0_1_, Packet<?> p_channelRead0_2_) throws Exception {
+    protected void channelRead0(ChannelHandlerContext p_channelRead0_1_, Packet<?> p_channelRead0_2_) {
         logger.info(() -> "SpatialNetworkManager#channelRead0 not implemented");
     }
 

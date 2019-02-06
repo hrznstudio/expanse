@@ -17,7 +17,9 @@ import minecraft.world.State;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.chunk.NibbleArray;
 import net.minecraft.world.chunk.storage.RegionFileCache;
+import net.minecraftforge.common.util.Constants;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -40,18 +42,18 @@ public class WorldConverter {
         long currentEntityId = 1;
         File world = new File("world");
         NBTTagCompound leveldat = CompressedStreamTools.readCompressed(new FileInputStream(new File(world, "level.dat")));
-        Map<Byte, Block> map = new HashMap<>();
+        Map<Integer, Block> map = new HashMap<>();
         if(leveldat.hasKey("FML")) {
             leveldat
                     .getCompoundTag("FML")
                     .getCompoundTag("Registries")
                     .getCompoundTag("minecraft:blocks")
                     .getTagList("ids", 10)
-                    .forEach(nbtBase -> map.put(((NBTTagCompound) nbtBase).getByte("V"), new Block(((NBTTagCompound) nbtBase).getString("K"))));
+                    .forEach(nbtBase -> map.put((int)((NBTTagCompound) nbtBase).getByte("V"), new Block(((NBTTagCompound) nbtBase).getString("K"))));
         } else {
             Gson gson = new Gson();
             BlockData[] arr = gson.fromJson(new FileReader(new File("data.json")), BlockData[].class);
-            Stream.of(arr).forEach(blockData -> map.putIfAbsent((byte) blockData.type, new Block("minecraft:" + blockData.textType)));
+            Stream.of(arr).forEach(blockData -> map.putIfAbsent(blockData.type, new Block("minecraft:" + blockData.textType)));
         }
         for (int x = negativeChunks; x < chunks; x++) {
             for (int z = negativeChunks; z < chunks; z++) {
@@ -69,6 +71,13 @@ public class WorldConverter {
                         for(int wah = 0; wah <sections.tagCount(); wah++) {
                             NBTTagCompound section = sections.getCompoundTagAt(wah);
                             byte[] metaArray = section.getByteArray("Data");
+                            byte[] addArray = null;
+                            if(section.hasKey("Add", 7))
+                                addArray=section.getByteArray("Add");
+                            NibbleArray extensionNibble = null;
+                            if(addArray==null)
+                                extensionNibble=new NibbleArray(addArray);
+                            NibbleArray metaNibble = new NibbleArray(metaArray);
                             byte[] byteArray = section.getByteArray("Blocks");
                             for (int i = 0; i < byteArray.length; i++) {
                                 byte b = byteArray[i];
@@ -78,7 +87,10 @@ public class WorldConverter {
                                 int k = (i >> 8) & 15; //y
                                 int l = i >> 4 & 15; //z
                                 chunkData.putIfAbsent((int) section.getByte("Y"), new HashMap<>());
-                                chunkData.get((int) section.getByte("Y")).put(Converters.blockPosToChunkIndex(j, k, l), new State(map.get(b), metaArray[i % metaArray.length]));
+                                int extensionID = extensionNibble == null ? 0 : extensionNibble.get(j,k,l);
+                                int blockID = extensionID << 8 | (b & 255);
+                                int meta = metaNibble.get(j,k,l);
+                                chunkData.get((int) section.getByte("Y")).put(Converters.blockPosToChunkIndex(j, k, l), new State(map.get(blockID), meta));
                             }
                         }
 
