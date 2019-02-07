@@ -4,12 +4,10 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.hrznstudio.spatial.client.vanillawrappers.WorldClientSpatial;
 import com.hrznstudio.spatial.util.Converters;
+import com.hrznstudio.spatial.util.EntityRequirementCallback;
+import com.hrznstudio.spatial.util.Util;
 import com.hrznstudio.spatial.worker.chunk.ChunkWorker;
-import improbable.Metadata;
-import improbable.MetadataData;
 import improbable.Position;
-import improbable.PositionData;
-import improbable.collections.Option;
 import improbable.worker.Entity;
 import improbable.worker.EntityId;
 import improbable.worker.View;
@@ -18,8 +16,8 @@ import minecraft.world.ChunkStorageData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.chunk.NibbleArray;
-import net.minecraft.world.chunk.storage.NibbleArrayReader;
+
+import javax.annotation.Nullable;
 
 public class ClientView extends View {
 
@@ -29,31 +27,22 @@ public class ClientView extends View {
 
     public ClientView() {
         this.onRemoveEntity(op -> removeChunk(op.entityId));
-        new ComponentRequirement(this, id -> {
-            Entity entity = ClientView.this.entities.get(id);
-            final Option<PositionData> pos = entity.get(Position.COMPONENT);
-            if (!pos.isPresent())
-                return;
-            final BlockPos chunkPos = Converters.improbableToChunkPos(pos.get());
-            final Option<MetadataData> meta = entity.get(Metadata.COMPONENT);
-            if (meta.isPresent() && meta.get().getEntityType().equals(ChunkWorker.CHUNK))
-                addChunk(chunkPos, id);
-            final Option<ChunkStorageData> storage = entity.get(ChunkStorage.COMPONENT);
-            if (storage.isPresent())
-                ((WorldClientSpatial) Minecraft.getMinecraft().world).loadChunk(chunkPos, storage.get());
-        }, Position.COMPONENT, Metadata.COMPONENT, ChunkStorage.COMPONENT);
-        this.onComponentUpdate(ChunkStorage.COMPONENT, argument -> {
-            EntityId id = argument.entityId;
-            Entity entity = ClientView.this.entities.get(id);
-            final Option<PositionData> pos = entity.get(Position.COMPONENT);
-            if (!pos.isPresent())
-                return;
-            final BlockPos chunkPos = Converters.improbableToChunkPos(pos.get());
-            final Option<MetadataData> meta = entity.get(Metadata.COMPONENT);
-            if (meta.isPresent() && meta.get().getEntityType().equals(ChunkWorker.CHUNK)) {
-                //TODO: Change blocks based on update
-            }
-        });
+        EntityRequirementCallback.builder(
+                (id) -> {
+                    Entity entity = getEntity(id);
+                    BlockPos pos = Converters.improbableToChunkPos(Util.getData(entity, Position.COMPONENT));
+                    addChunk(pos, id);
+                    ((WorldClientSpatial) Minecraft.getMinecraft().world).loadChunk(pos, Util.getData(entity, ChunkStorage.COMPONENT));
+                })
+                .requireType(ChunkWorker.CHUNK)
+                .requireComponent(Position.COMPONENT)
+                .requireComponent(ChunkStorage.COMPONENT)
+                .attach(this);
+    }
+
+    @Nullable
+    public Entity getEntity(EntityId id) {
+        return entities.get(id);
     }
 
     private void removeChunk(EntityId chunk) {
@@ -72,7 +61,7 @@ public class ClientView extends View {
     public ChunkStorageData getChunk(final BlockPos pos) {
         EntityId id = posToIdChunks.get(pos);
         if (id == null) return empty;
-        Entity entity = entities.get(id);
+        Entity entity = getEntity(id);
         if (entity == null) return empty;
         return entity.get(ChunkStorage.COMPONENT).orElse(empty);
     }
