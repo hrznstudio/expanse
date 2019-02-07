@@ -31,25 +31,25 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class WorldConverter {
-    private static int worldSize = 64;
+    private static int worldSize = 512;
     private static final String CHUNK = "chunk";
     private static final WorkerRequirementSet CHUNK_REQUIREMENT_SET = new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("chunk_worker"))));
 
     public static void main(String[] args) throws Exception {
         SnapshotOutputStream outputStream = new SnapshotOutputStream("default.snapshot");
-        final int chunks = (worldSize/2) >> 4;
+        final int chunks = (worldSize / 2) >> 4;
         final int negativeChunks = -chunks;
         long currentEntityId = 1;
         File world = new File("world");
         NBTTagCompound leveldat = CompressedStreamTools.readCompressed(new FileInputStream(new File(world, "level.dat")));
         Map<Integer, Block> map = new HashMap<>();
-        if(leveldat.hasKey("FML")) {
+        if (leveldat.hasKey("FML")) {
             leveldat
                     .getCompoundTag("FML")
                     .getCompoundTag("Registries")
                     .getCompoundTag("minecraft:blocks")
                     .getTagList("ids", 10)
-                    .forEach(nbtBase -> map.put((int)((NBTTagCompound) nbtBase).getByte("V"), new Block(((NBTTagCompound) nbtBase).getString("K"))));
+                    .forEach(nbtBase -> map.put((int) ((NBTTagCompound) nbtBase).getByte("V"), new Block(((NBTTagCompound) nbtBase).getString("K"))));
         } else {
             Gson gson = new Gson();
             BlockData[] arr = gson.fromJson(new FileReader(new File("data.json")), BlockData[].class);
@@ -68,28 +68,28 @@ public class WorldConverter {
                         Map<Integer, Map<Integer, State>> chunkData = new HashMap<>();
                         NBTTagCompound level = compound.getCompoundTag("Level");
                         NBTTagList sections = level.getTagList("Sections", 10);
-                        for(int wah = 0; wah <sections.tagCount(); wah++) {
+                        for (int wah = 0; wah < sections.tagCount(); wah++) {
                             NBTTagCompound section = sections.getCompoundTagAt(wah);
                             byte[] metaArray = section.getByteArray("Data");
                             byte[] addArray = null;
-                            if(section.hasKey("Add", 7))
-                                addArray=section.getByteArray("Add");
+                            if (section.hasKey("Add", 7))
+                                addArray = section.getByteArray("Add");
                             NibbleArray extensionNibble = null;
-                            if(addArray==null)
-                                extensionNibble=new NibbleArray(addArray);
+                            if (addArray != null)
+                                extensionNibble = new NibbleArray(addArray);
                             NibbleArray metaNibble = new NibbleArray(metaArray);
                             byte[] byteArray = section.getByteArray("Blocks");
                             for (int i = 0; i < byteArray.length; i++) {
                                 byte b = byteArray[i];
-                                if (map.get(b).getId().equals("minecraft:air"))
-                                    continue;
                                 int j = i & 15; //x
                                 int k = (i >> 8) & 15; //y
                                 int l = i >> 4 & 15; //z
-                                chunkData.putIfAbsent((int) section.getByte("Y"), new HashMap<>());
-                                int extensionID = extensionNibble == null ? 0 : extensionNibble.get(j,k,l);
+                                int extensionID = extensionNibble == null ? 0 : extensionNibble.get(j, k, l);
                                 int blockID = extensionID << 8 | (b & 255);
-                                int meta = metaNibble.get(j,k,l);
+                                int meta = metaNibble.get(j, k, l);
+                                if (map.get(blockID).getId().equals("minecraft:air"))
+                                    continue;
+                                chunkData.putIfAbsent((int) section.getByte("Y"), new HashMap<>());
                                 chunkData.get((int) section.getByte("Y")).put(Converters.blockPosToChunkIndex(j, k, l), new State(map.get(blockID), meta));
                             }
                         }
