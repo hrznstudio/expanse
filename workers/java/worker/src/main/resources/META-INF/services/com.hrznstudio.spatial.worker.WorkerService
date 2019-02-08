@@ -1,1 +1,2 @@
 com.hrznstudio.spatial.worker.chunk.ChunkWorker
+com.hrznstudio.spatial.worker.entity.EntityWorker

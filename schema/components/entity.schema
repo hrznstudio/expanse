@@ -31,6 +31,10 @@ component Motion {
   improbable.Coordinates coords = 1;
 }
 
+component WorldEntity {
+  id= 1010;
+}
+
 type GameProfile {
   string uuid = 1;
 }
@@ -40,6 +44,15 @@ component Player {
   GameProfile profile = 1;
   bool sneaking = 2;
   bool sprinting = 3;
+}
+
+type Heartbeat {
+
+}
+
+component PlayerConnection {
+  id = 1009;
+  event Heartbeat heartbeat;
 }
 
 component ChatAbility {

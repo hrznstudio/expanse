@@ -5,9 +5,7 @@ import com.hrznstudio.spatial.util.ConnectionManager;
 import improbable.Coordinates;
 import improbable.Position;
 import improbable.worker.EntityId;
-import minecraft.entity.Motion;
-import minecraft.entity.Player;
-import minecraft.entity.Rotation;
+import minecraft.entity.*;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.spongepowered.asm.mixin.Mixin;
@@ -48,7 +46,7 @@ public abstract class MixinEntityPlayerSP {
     public void onUpdateWalkingPlayer(EntityPlayerSP playerSP) {
         if (ConnectionManager.getConnectionStatus().isConnected()) {
             boolean flag = playerSP.isSprinting();
-            EntityId id = ((ISpatialEntity)playerSP).getSpatialId();
+            EntityId id = ((ISpatialEntity) playerSP).getSpatialId();
             if (id == null) {
                 return;
             }
@@ -98,6 +96,7 @@ public abstract class MixinEntityPlayerSP {
                     playerSP.motionY,
                     playerSP.motionZ
             )));
+            ConnectionManager.getConnection().sendComponentUpdate(PlayerConnection.COMPONENT, id, new PlayerConnection.Update().addHeartbeat(new Heartbeat()));
 
             this.positionUpdateTicks = 0;
         }

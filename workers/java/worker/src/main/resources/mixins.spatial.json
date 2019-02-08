@@ -12,6 +12,7 @@
   ],
   "client": [
     "MixinEntityPlayerSP",
-    "MixinNetHandlerPlayClient"
+    "MixinNetHandlerPlayClient",
+    "MixinPlayerControllerMP"
   ]
 }

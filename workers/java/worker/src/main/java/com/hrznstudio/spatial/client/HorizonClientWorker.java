@@ -1,6 +1,7 @@
 package com.hrznstudio.spatial.client;
 
 import com.hrznstudio.spatial.client.vanillawrappers.SpatialNetworkManager;
+import com.hrznstudio.spatial.util.CommonWorkerRequirements;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.ConnectionStatus;
 import com.hrznstudio.spatial.util.EntityBuilder;
@@ -11,11 +12,14 @@ import improbable.WorkerAttributeSet;
 import improbable.WorkerRequirementSet;
 import improbable.collections.Option;
 import improbable.worker.*;
+import minecraft.entity.PlayerConnection;
+import minecraft.entity.PlayerConnectionData;
+import minecraft.entity.WorldEntity;
+import minecraft.entity.WorldEntityData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketJoinGame;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
@@ -30,7 +34,7 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class HorizonClientWorker extends BaseWorker<ClientView> {
-    private EntityId playerId;
+    private volatile EntityId playerId;
     private NetHandlerPlayClient netHandlerPlayClient;
     private NetworkManager networkManager;
     private GuiMainMenu guiMainMenu;
@@ -79,22 +83,33 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
                 builder.addComponent(Position.COMPONENT, new improbable.PositionData(new Coordinates(5, 200, 5)), // TODO: use position from server
                         new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
                 );
+                builder.addComponent(
+                        PlayerConnection.COMPONENT,
+                        new PlayerConnectionData(),
+                        new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
+                );
+                builder.addComponent(
+                        WorldEntity.COMPONENT,
+                        new WorldEntityData(),
+                        CommonWorkerRequirements.createWorkerRequirementSet("entity_worker")
+                );
                 createEntityRequestRequestId.set(connection.sendCreateEntityRequest(builder.build(), op.firstEntityId, timeoutMillis));
             }
         });
+        Minecraft mc = Minecraft.getMinecraft();
         dispatcher.onCreateEntityResponse(argument -> {
             if (argument.requestId.equals(createEntityRequestRequestId.get()) && argument.statusCode == StatusCode.SUCCESS) {
                 playerId = argument.entityId.get();
+            } else {
+                stop();
             }
         });
-
-        Minecraft mc = Minecraft.getMinecraft();
-        networkManager = new SpatialNetworkManager(this);
-        netHandlerPlayClient = new NetHandlerPlayClient(mc, guiMainMenu, networkManager, mc.getSession().getProfile());
-        FMLClientHandler.instance().setPlayClient(netHandlerPlayClient);
-        NetworkDispatcher.allocAndSet(networkManager);
-
         mc.addScheduledTask(() -> {
+            networkManager = new SpatialNetworkManager(this);
+            netHandlerPlayClient = new NetHandlerPlayClient(mc, guiMainMenu, networkManager, mc.getSession().getProfile());
+            FMLClientHandler.instance().setPlayClient(netHandlerPlayClient);
+            NetworkDispatcher.allocAndSet(networkManager);
+            networkManager.setNetHandler(netHandlerPlayClient);
             netHandlerPlayClient.handleJoinGame(new SPacketJoinGame(
                     0,
                     GameType.CREATIVE,
@@ -106,7 +121,7 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
                     false
             ));
             netHandlerPlayClient.handlePlayerPosLook(new SPacketPlayerPosLook(
-                    5, 60, 5, 0, 0, Collections.emptySet(), -1
+                    8, 60, 8, 0, 0, Collections.emptySet(), -1
             )); // TODO: use position from server
         });
     }
