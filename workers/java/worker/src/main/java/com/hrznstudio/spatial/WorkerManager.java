@@ -1,12 +1,12 @@
 package com.hrznstudio.spatial;
 
+import com.hrznstudio.spatial.worker.WorkerService;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 @CommandLine.Command(name = "worker", sortOptions = false,
@@ -39,7 +39,7 @@ public class WorkerManager implements Runnable {
         } else
             logger.warn("Running the WorkerManager directly is not recommended. Please use SpatialLaunchWrapper instead.");
         ServiceLoader<WorkerService> workerService = ServiceLoader.load(WorkerService.class);
-        workerService.forEach(service -> workerMap.put(service.getWorkerID(), service));
+        workerService.forEach(service -> workerMap.put(service.getWorkerType(), service));
 
         CommandLine.run(new WorkerManager(), System.out, args);
     }
