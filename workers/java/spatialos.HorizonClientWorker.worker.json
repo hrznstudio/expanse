@@ -4,7 +4,9 @@
   },
   "bridge": {
     "worker_attribute_set": {
-      "attributes": []
+      "attributes": [
+        "horizon_client"
+      ]
     },
     "entity_interest": {
       "range_entity_interest": {
