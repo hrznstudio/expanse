@@ -89,7 +89,6 @@ public abstract class MixinEntityPlayerSP {
             }
 
             ConnectionManager.getConnection().sendComponentUpdate(PlayerInput.COMPONENT, id, update);
-            ConnectionManager.getConnection().sendComponentUpdate(PlayerConnection.COMPONENT, id, new PlayerConnection.Update().addHeartbeat(new Heartbeat()));
 
             this.positionUpdateTicks = 0;
         }

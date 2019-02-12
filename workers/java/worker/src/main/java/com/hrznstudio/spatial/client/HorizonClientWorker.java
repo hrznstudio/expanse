@@ -24,6 +24,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.network.handshake.NetworkDispatcher;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -37,13 +38,9 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         super(ClientView::new);
     }
 
+    @Nullable
     public EntityId getPlayerId() {
         return playerId;
-    }
-
-    @Override
-    public String makeName() {
-        return getWorkerType() + NAME_SEPARATOR + Minecraft.getMinecraft().getSession().getPlayerID();
     }
 
     @Override

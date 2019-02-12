@@ -3,8 +3,11 @@ package com.hrznstudio.spatial.client;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.hrznstudio.spatial.SpatialMod;
+import com.hrznstudio.spatial.api.IDispatcherLoop;
+import com.hrznstudio.spatial.api.ISpatialEntity;
 import com.hrznstudio.spatial.api.ISpatialWorld;
 import com.hrznstudio.spatial.client.vanillawrappers.WorldClientSpatial;
+import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.Converters;
 import com.hrznstudio.spatial.util.EntityRequirementCallback;
 import com.hrznstudio.spatial.util.Util;
@@ -12,13 +15,11 @@ import com.hrznstudio.spatial.worker.chunk.ChunkWorker;
 import com.mojang.authlib.GameProfile;
 import improbable.Coordinates;
 import improbable.Position;
+import improbable.Vector3f;
 import improbable.worker.Entity;
 import improbable.worker.EntityId;
 import improbable.worker.View;
-import minecraft.entity.PlayerInfo;
-import minecraft.entity.PlayerInfoData;
-import minecraft.entity.Rotation;
-import minecraft.entity.RotationData;
+import minecraft.entity.*;
 import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
 import net.minecraft.client.Minecraft;
@@ -33,12 +34,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ClientView extends View {
+public class ClientView extends View implements IDispatcherLoop {
 
     private final ChunkStorageData empty = ChunkStorageData.create();
     private final BiMap<BlockPos, EntityId> posToIdChunks = HashBiMap.create();
     private final BiMap<EntityId, BlockPos> idToPosChunks = posToIdChunks.inverse();
     public final List<EntityId> players = new ArrayList<>();
+
+    @Override
+    public void onLoop() {
+        if (SpatialMod.getClientWorker().getPlayerId() != null)
+            ConnectionManager.getConnection().sendComponentUpdate(PlayerConnection.COMPONENT, SpatialMod.getClientWorker().getPlayerId(), new PlayerConnection.Update().addHeartbeat(new Heartbeat()));
+    }
 
     public ClientView() {
         this.onRemoveEntity(op -> removeEntity(op.entityId));
@@ -55,11 +62,11 @@ public class ClientView extends View {
                 .attach(this);
         EntityRequirementCallback.builder(
                 (id) -> {
-                    if(id== SpatialMod.getClientWorker().getPlayerId())
+                    if (id == SpatialMod.getClientWorker().getPlayerId())
                         return;
                     WorldClient world = Minecraft.getMinecraft().world;
                     if (world == null) {
-                        players.add(id);
+                        players.add(id); //TODO: Figure out when best to load these players who get sent before world load
                     } else {
                         Entity entity = getEntity(id);
                         Coordinates pos = Util.getData(entity, Position.COMPONENT).getCoords();
@@ -80,6 +87,7 @@ public class ClientView extends View {
                         mp.lastTickPosZ = d2;
                         EntityTracker.updateServerPosition(mp, d0, d1, d2);
                         mp.setPositionAndRotation(d0, d1, d2, f, f1);
+                        ((ISpatialEntity) mp).setSpatialId(id);
                         world.addEntityToWorld(mp.getEntityId(), mp);
                     }
                 })
@@ -93,16 +101,60 @@ public class ClientView extends View {
                 if (coords != null) {
                     Minecraft.getMinecraft().addScheduledTask(() -> {
                         WorldClient world = Minecraft.getMinecraft().world;
+                        if (world == null)
+                            return;
                         if (argument.entityId.equals(SpatialMod.getClientWorker().getPlayerId())) {
                             double dist = 0.5;
                             boolean x = Util.isWithin(Minecraft.getMinecraft().player.posX, coords.getX(), dist);
                             boolean y = Util.isWithin(Minecraft.getMinecraft().player.posY, coords.getY(), dist);
                             boolean z = Util.isWithin(Minecraft.getMinecraft().player.posZ, coords.getZ(), dist);
                             if (!x && !y && !z) {
-                                ((ISpatialWorld) world).getEntityById(argument.entityId).setPositionAndUpdate(coords.getX(), coords.getY(), coords.getZ());
+                                net.minecraft.entity.Entity entity = Minecraft.getMinecraft().player;
+                                if (entity != null)
+                                    entity.setPositionAndUpdate(coords.getX(), coords.getY(), coords.getZ());
                             }
                         } else {
-                            ((ISpatialWorld) world).getEntityById(argument.entityId).setPositionAndUpdate(coords.getX(), coords.getY(), coords.getZ());
+                            net.minecraft.entity.Entity entity = ((ISpatialWorld) world).getEntityById(argument.entityId);
+                            if (entity != null)
+                                entity.setPositionAndUpdate(coords.getX(), coords.getY(), coords.getZ());
+                        }
+                    });
+                }
+            }
+        });
+        onComponentUpdate(Rotation.COMPONENT, argument -> {
+            if (Util.getType(entities.get(argument.entityId)).equals("Player")) {
+                if (argument.entityId.equals(SpatialMod.getClientWorker().getPlayerId()))
+                    return;
+                Float pitch = argument.update.getPitch().orElse(null);
+                Float yaw = argument.update.getYaw().orElse(null);
+                if (yaw != null || pitch != null) {
+                    Minecraft.getMinecraft().addScheduledTask(() -> {
+                        WorldClient world = Minecraft.getMinecraft().world;
+                        if (world == null)
+                            return;
+                        net.minecraft.entity.Entity entity = ((ISpatialWorld) world).getEntityById(argument.entityId);
+                        if (entity != null)
+                            entity.setPositionAndRotation(entity.posX, entity.posY, entity.posZ, pitch == null ? entity.rotationPitch : pitch, yaw == null ? entity.rotationYaw : yaw);
+                    });
+                }
+            }
+        });
+        onComponentUpdate(Motion.COMPONENT, argument -> {
+            if (Util.getType(entities.get(argument.entityId)).equals("Player")) {
+                if (argument.entityId.equals(SpatialMod.getClientWorker().getPlayerId()))
+                    return;
+                Vector3f motion = argument.update.getMotion().orElse(null);
+                if (motion != null) {
+                    Minecraft.getMinecraft().addScheduledTask(() -> {
+                        WorldClient world = Minecraft.getMinecraft().world;
+                        if (world == null)
+                            return;
+                        net.minecraft.entity.Entity entity = ((ISpatialWorld) world).getEntityById(argument.entityId);
+                        if (entity != null) {
+                            entity.motionX = motion.getX();
+                            entity.motionY = motion.getY();
+                            entity.motionZ = motion.getZ();
                         }
                     });
                 }
