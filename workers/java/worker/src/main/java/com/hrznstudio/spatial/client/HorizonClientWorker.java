@@ -6,16 +6,10 @@ import com.hrznstudio.spatial.util.ConnectionManager;
 import com.hrznstudio.spatial.util.ConnectionStatus;
 import com.hrznstudio.spatial.util.EntityBuilder;
 import com.hrznstudio.spatial.worker.BaseWorker;
-import improbable.Coordinates;
-import improbable.Position;
-import improbable.WorkerAttributeSet;
-import improbable.WorkerRequirementSet;
+import improbable.*;
 import improbable.collections.Option;
 import improbable.worker.*;
-import minecraft.entity.PlayerConnection;
-import minecraft.entity.PlayerConnectionData;
-import minecraft.entity.WorldEntity;
-import minecraft.entity.WorldEntityData;
+import minecraft.entity.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -45,6 +39,11 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
 
     public EntityId getPlayerId() {
         return playerId;
+    }
+
+    @Override
+    public String makeName() {
+        return getWorkerType() + NAME_SEPARATOR + Minecraft.getMinecraft().getSession().getPlayerID();
     }
 
     @Override
@@ -80,12 +79,36 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         dispatcher.onReserveEntityIdsResponse(op -> {
             if (op.requestId.equals(entityIdReservationRequestId) && op.statusCode == StatusCode.SUCCESS) {
                 EntityBuilder builder = new EntityBuilder("Player");
-                builder.addComponent(Position.COMPONENT, new improbable.PositionData(new Coordinates(5, 200, 5)), // TODO: use position from server
+                builder.addComponent(Position.COMPONENT, new improbable.PositionData(new Coordinates(8, 20, 8)), // TODO: use position from server
+                        CommonWorkerRequirements.createWorkerRequirementSet("entity_worker")
+                );
+                builder.addComponent(
+                        PlayerInfo.COMPONENT,
+                        new PlayerInfoData(new GameProfile(
+                                Minecraft.getMinecraft().getSession().getPlayerID(), Minecraft.getMinecraft().getSession().getUsername()
+                        )
+                        ),
+                        CommonWorkerRequirements.createWorkerRequirementSet("entity_worker")
+                );
+                builder.addComponent(
+                        PlayerInput.COMPONENT,
+                        new PlayerInputData(new Vector3f(0, 0, 0), false, false
+                        ),
                         new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
                 );
                 builder.addComponent(
                         PlayerConnection.COMPONENT,
                         new PlayerConnectionData(),
+                        new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
+                );
+                builder.addComponent(
+                        Motion.COMPONENT,
+                        new MotionData(new Vector3f(0, 0, 0)),
+                        CommonWorkerRequirements.createWorkerRequirementSet("entity_worker")
+                );
+                builder.addComponent(
+                        Rotation.COMPONENT,
+                        new RotationData(0, 0),
                         new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
                 );
                 builder.addComponent(
@@ -131,6 +154,5 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         super.onDisConnected(reason);
         WorldClient wc = Minecraft.getMinecraft().world;
         if (wc != null) wc.sendQuittingDisconnectingPacket();
-        // TODO: remove player entity
     }
 }

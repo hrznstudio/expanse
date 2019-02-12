@@ -4,6 +4,7 @@ import com.hrznstudio.spatial.api.ISpatialEntity;
 import com.hrznstudio.spatial.util.ConnectionManager;
 import improbable.Coordinates;
 import improbable.Position;
+import improbable.Vector3f;
 import improbable.worker.EntityId;
 import minecraft.entity.*;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -40,8 +41,6 @@ public abstract class MixinEntityPlayerSP {
     @Shadow
     private float lastReportedPitch;
 
-    @Shadow public abstract void sendPlayerAbilities();
-
     @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;onUpdateWalkingPlayer()V"))
     public void onUpdateWalkingPlayer(EntityPlayerSP playerSP) {
         if (ConnectionManager.getConnectionStatus().isConnected()) {
@@ -51,21 +50,18 @@ public abstract class MixinEntityPlayerSP {
                 return;
             }
 
-            boolean uSp = false, uSn = false;
+            PlayerInput.Update update = new PlayerInput.Update();
 
             if (flag != serverSprintState) {
-                uSp = true;
+                update.setSprinting(flag);
                 serverSprintState = flag;
             }
 
             boolean flag2 = playerSP.isSneaking();
 
             if (flag2 != serverSneakState) {
-                uSn = true;
+                update.setSneaking(flag2);
                 serverSneakState = flag2;
-            }
-            if (uSn || uSp) {
-                ConnectionManager.getConnection().sendComponentUpdate(Player.COMPONENT, id, new Player.Update().setSneaking(flag2).setSprinting(flag));
             }
 
             ++this.positionUpdateTicks;
@@ -79,7 +75,7 @@ public abstract class MixinEntityPlayerSP {
             boolean rot = d3 != 0.0D || d4 != 0.0D;
 
             if (pos) {
-                ConnectionManager.getConnection().sendComponentUpdate(Position.COMPONENT, id, new Position.Update().setCoords(new Coordinates(playerSP.posX, playerSP.posY, playerSP.posZ)));
+                update.setMovePosition(new Vector3f((float) playerSP.posX, (float) playerSP.posY, (float) playerSP.posZ));
                 this.lastReportedPosX = playerSP.posX;
                 this.lastReportedPosY = axisalignedbb.minY;
                 this.lastReportedPosZ = playerSP.posZ;
@@ -91,11 +87,8 @@ public abstract class MixinEntityPlayerSP {
                 this.lastReportedYaw = playerSP.rotationYaw;
                 this.lastReportedPitch = playerSP.rotationPitch;
             }
-            ConnectionManager.getConnection().sendComponentUpdate(Motion.COMPONENT, id, new Motion.Update().setCoords(new Coordinates(
-                    playerSP.motionX,
-                    playerSP.motionY,
-                    playerSP.motionZ
-            )));
+
+            ConnectionManager.getConnection().sendComponentUpdate(PlayerInput.COMPONENT, id, update);
             ConnectionManager.getConnection().sendComponentUpdate(PlayerConnection.COMPONENT, id, new PlayerConnection.Update().addHeartbeat(new Heartbeat()));
 
             this.positionUpdateTicks = 0;

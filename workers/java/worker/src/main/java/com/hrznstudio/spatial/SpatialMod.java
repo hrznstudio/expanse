@@ -2,23 +2,27 @@ package com.hrznstudio.spatial;
 
 import com.hrznstudio.spatial.client.GuiConnecting;
 import com.hrznstudio.spatial.client.HorizonClientWorker;
-import com.hrznstudio.spatial.util.CommonWorkerRequirements;
-import com.hrznstudio.spatial.util.EntityBuilder;
+import com.hrznstudio.spatial.util.Util;
+import com.mojang.authlib.GameProfile;
 import improbable.Coordinates;
 import improbable.Position;
-import improbable.PositionData;
 import improbable.worker.Entity;
-import minecraft.entity.*;
-import minecraft.inventory.Inventory;
-import minecraft.inventory.InventoryData;
+import minecraft.entity.PlayerInfo;
+import minecraft.entity.PlayerInfoData;
+import minecraft.entity.Rotation;
+import minecraft.entity.RotationData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.EntityTracker;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Mod(modid = "spatial", name = "Spatial", version = "0.0.1")
@@ -43,45 +47,5 @@ public class SpatialMod {
 
     @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
-    }
-
-    public static Entity createPlayerEntity() {
-        EntityBuilder builder = new EntityBuilder("Player");
-        builder.addComponent(
-                Position.COMPONENT,
-                new PositionData(new Coordinates(0, 0, 0)),
-                CommonWorkerRequirements.getEntityWorkers()
-        );
-        builder.addComponent(
-                Player.COMPONENT,
-                new PlayerData(new GameProfile(UUID.randomUUID().toString()), false, false),
-                CommonWorkerRequirements.getEntityWorkers()
-        );
-        builder.addComponent(
-                Health.COMPONENT,
-                new HealthData(20, 20),
-                CommonWorkerRequirements.getEntityWorkers()
-        );
-        builder.addComponent(
-                Food.COMPONENT,
-                new FoodData(20, 20),
-                CommonWorkerRequirements.getEntityWorkers()
-        );
-        builder.addComponent(
-                Experience.COMPONENT,
-                new ExperienceData(0),
-                CommonWorkerRequirements.getEntityWorkers()
-        );
-        builder.addComponent(
-                Inventory.COMPONENT,
-                new InventoryData(Collections.emptyMap()),
-                CommonWorkerRequirements.getEntityWorkers()
-        );
-        builder.addComponent(
-                Flammable.COMPONENT,
-                new FlammableData(false),
-                CommonWorkerRequirements.getEntityWorkers()
-        );
-        return builder.build();
     }
 }
