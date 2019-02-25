@@ -20,6 +20,15 @@
         "options": {
           "manual_worker_connection_only": true
         }
+      },
+      {
+        "layer": "entity_worker",
+        "hex_grid": {
+          "num_workers": 1
+        },
+        "options": {
+          "manual_worker_connection_only": true
+        }
       }
     ]
   },
@@ -42,6 +51,14 @@
     },
     {
       "worker_type": "HorizonClientWorker",
+      "permissions": [
+        {
+          "all": {}
+        }
+      ]
+    },
+    {
+      "worker_type": "EntityWorker",
       "permissions": [
         {
           "all": {}

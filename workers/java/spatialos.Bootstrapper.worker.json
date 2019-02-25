@@ -1,0 +1,54 @@
+{
+  "build": {
+    "tasks_filename": "spatialos.java.build.json"
+  },
+  "bridge": {
+    "worker_attribute_set": {
+      "attributes": [
+        "bootstrap"
+      ]
+    },
+    "entity_interest": {
+      "range_entity_interest": {
+        "radius": 0
+      }
+    },
+    "streaming_query": [],
+    "component_delivery": {
+      "default": "RELIABLE_ORDERED",
+      "checkout_all_initially": true
+    }
+  },
+  "external": {
+    "default": {
+      "run_type": "EXECUTABLE_ZIP",
+      "linux": {
+        "artifact_name": "HorizonJavaWorker@Linux.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "HorizonJavaWorker.jar",
+          "Bootstrapper"
+        ]
+      },
+      "windows": {
+        "artifact_name": "HorizonJavaWorker@Windows.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "HorizonJavaWorker.jar",
+          "Bootstrapper"
+        ]
+      },
+      "macos": {
+        "artifact_name": "HorizonJavaWorker@Mac.zip",
+        "command": "java",
+        "arguments": [
+          "-jar",
+          "HorizonJavaWorker.jar",
+          "Bootstrapper"
+        ]
+      }
+    }
+  }
+}

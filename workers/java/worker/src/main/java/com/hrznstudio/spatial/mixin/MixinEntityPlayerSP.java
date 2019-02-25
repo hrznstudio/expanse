@@ -1,13 +1,11 @@
 package com.hrznstudio.spatial.mixin;
 
-import com.hrznstudio.spatial.SpatialMod;
+import com.hrznstudio.spatial.api.ISpatialEntity;
 import com.hrznstudio.spatial.util.ConnectionManager;
-import improbable.Coordinates;
-import improbable.Position;
+import improbable.Vector3f;
 import improbable.worker.EntityId;
-import minecraft.entity.Motion;
-import minecraft.entity.Player;
 import minecraft.entity.Rotation;
+import minecraft.player.PlayerInput;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EntityPlayerSP.class)
-public class MixinEntityPlayerSP {
+public abstract class MixinEntityPlayerSP {
 
     @Shadow
     private int positionUpdateTicks;
@@ -46,27 +44,23 @@ public class MixinEntityPlayerSP {
     public void onUpdateWalkingPlayer(EntityPlayerSP playerSP) {
         if (ConnectionManager.getConnectionStatus().isConnected()) {
             boolean flag = playerSP.isSprinting();
-
-            EntityId id = SpatialMod.getClientWorker().getPlayerId();
+            EntityId id = ((ISpatialEntity) playerSP).getSpatialId();
             if (id == null) {
                 return;
             }
 
-            boolean uSp = false, uSn = false;
+            PlayerInput.Update update = new PlayerInput.Update();
 
             if (flag != serverSprintState) {
-                uSp = true;
+                update.setSprinting(flag);
                 serverSprintState = flag;
             }
 
             boolean flag2 = playerSP.isSneaking();
 
             if (flag2 != serverSneakState) {
-                uSn = true;
+                update.setSneaking(flag2);
                 serverSneakState = flag2;
-            }
-            if (uSn || uSp) {
-                ConnectionManager.getConnection().sendComponentUpdate(Player.COMPONENT, id, new Player.Update().setSneaking(flag2).setSprinting(flag));
             }
 
             ++this.positionUpdateTicks;
@@ -80,7 +74,7 @@ public class MixinEntityPlayerSP {
             boolean rot = d3 != 0.0D || d4 != 0.0D;
 
             if (pos) {
-                ConnectionManager.getConnection().sendComponentUpdate(Position.COMPONENT, id, new Position.Update().setCoords(new Coordinates(playerSP.posX, playerSP.posY, playerSP.posZ)));
+                update.setMovePosition(new Vector3f((float) playerSP.posX, (float) playerSP.posY, (float) playerSP.posZ));
                 this.lastReportedPosX = playerSP.posX;
                 this.lastReportedPosY = axisalignedbb.minY;
                 this.lastReportedPosZ = playerSP.posZ;
@@ -92,11 +86,8 @@ public class MixinEntityPlayerSP {
                 this.lastReportedYaw = playerSP.rotationYaw;
                 this.lastReportedPitch = playerSP.rotationPitch;
             }
-            ConnectionManager.getConnection().sendComponentUpdate(Motion.COMPONENT, id, new Motion.Update().setCoords(new Coordinates(
-                    playerSP.motionX,
-                    playerSP.motionY,
-                    playerSP.motionZ
-            )));
+
+            ConnectionManager.getConnection().sendComponentUpdate(PlayerInput.COMPONENT, id, update);
 
             this.positionUpdateTicks = 0;
         }

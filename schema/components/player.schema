@@ -1,0 +1,36 @@
+package minecraft.player;
+
+import "improbable/vector3.schema";
+
+// Reserves 1450-1499
+
+type GameProfile {
+  string uuid = 1;
+  string name = 2;
+}
+
+component PlayerInfo {
+  id = 1450;
+  GameProfile profile = 1;
+}
+
+component MapRepresentation {
+  id = 1453;
+  uint32 colour = 1;
+  string icon = 2;
+}
+
+component PlayerInput {
+  id = 1451;
+  improbable.Vector3f move_position = 1;
+  bool sprinting = 2;
+  bool sneaking = 3;
+}
+
+type Heartbeat {
+}
+
+component PlayerConnection {
+  id = 1452;
+  event Heartbeat heartbeat;
+}

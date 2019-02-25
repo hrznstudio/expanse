@@ -1,0 +1,18 @@
+package minecraft.boostrap;
+
+import "components/player.schema";
+
+// Reserves 1400-1449
+
+type Message {
+  string message = 1;
+}
+
+/**
+ * A single chunk holds 16x16x16 states.
+ */
+component Bootstrap {
+  id = 1400;
+  map<string, minecraft.player.GameProfile> online_players = 1;
+  command Message on_chat(Message);
+}

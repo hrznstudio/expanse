@@ -1,5 +1,6 @@
 package com.hrznstudio.spatial.util;
 
+import com.hrznstudio.spatial.api.IDispatcherLoop;
 import improbable.worker.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -97,10 +98,11 @@ public class ConnectionManager {
     private static void runEventLoop() {
         java.time.Duration maxWait = java.time.Duration.ofMillis(Math.round(1000.0 / UPDATES_PER_SECOND));
         while (isConnected()) {
+            if(dispatcher instanceof IDispatcherLoop)
+                ((IDispatcherLoop) dispatcher).onLoop();
             long startTime = System.nanoTime();
             OpList opList = connection.getOpList(0);
             processingPool.submit(() -> dispatcher.process(opList));
-
             long stopTime = System.nanoTime();
             java.time.Duration waitFor = maxWait.minusNanos(stopTime - startTime);
             try {

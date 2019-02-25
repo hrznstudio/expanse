@@ -1,5 +1,6 @@
 package minecraft.entity;
 import "improbable/standard_library.schema";
+import "improbable/vector3.schema";
 
 // Reserves 1000-1099
 
@@ -28,18 +29,11 @@ component Rotation {
 
 component Motion {
   id = 1005;
-  improbable.Coordinates coords = 1;
+  improbable.Vector3f motion = 1;
 }
 
-type GameProfile {
-  string uuid = 1;
-}
-
-component Player {
-  id = 1006;
-  GameProfile profile = 1;
-  bool sneaking = 2;
-  bool sprinting = 3;
+component WorldEntity {
+  id= 1010;
 }
 
 component ChatAbility {

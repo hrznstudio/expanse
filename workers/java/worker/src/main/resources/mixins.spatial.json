@@ -6,10 +6,13 @@
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinPackageScanner"
+    "MixinPackageScanner",
+    "MixinWorld",
+    "MixinEntity"
   ],
   "client": [
     "MixinEntityPlayerSP",
-    "MixinNetHandlerPlayClient"
+    "MixinNetHandlerPlayClient",
+    "MixinPlayerControllerMP"
   ]
 }
