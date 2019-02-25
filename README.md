@@ -9,6 +9,9 @@
 [![](https://img.shields.io/github/forks/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/network/members)
 [![](https://img.shields.io/github/stars/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/stargazers)
 [![](https://img.shields.io/github/license/hrznstudio/expanse.svg?logo=github&style=for-the-badge)](https://github.com/HRZNStudio/Expanse/blob/master/LICENSE)
+[![](https://img.shields.io/endpoint.svg?style=for-the-badge&url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fhrznstudio)](https://patreon.com/hrznstudio)
+
+https://shields.io/endpoint
 
 ## What is it?
 Expanse is a project which aims to completely replace minecraft's networking internals with SpatialOS to allow infinite worlds with near infinite people.
