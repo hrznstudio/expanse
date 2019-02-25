@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 public class EntityRequirementCallback {
-    //TODO: maybe make this delete old entities after a while to prevent high ram usage.
     private final Map<EntityId, Map<ComponentMetaclass<?, ?>, Object>> map;
     private final Callback callback;
     private final List<Requirement<?, ?>> requirements;
@@ -24,6 +23,8 @@ public class EntityRequirementCallback {
         for (Requirement requirement : requirements) {
             dispatcher.onAddComponent(requirement.getMetaclass(), argument -> addEntityMetaclassToMap(argument.entityId, requirement.getMetaclass(), argument.data, requirement));
         }
+
+        dispatcher.onRemoveEntity(argument -> map.remove(argument.entityId));
     }
 
     public static Builder builder(Callback callback) {
@@ -48,8 +49,10 @@ public class EntityRequirementCallback {
     }
 
     private void update(EntityId id) {
-        if (allPresent(id))
+        if (allPresent(id)) {
             callback.on(id);
+            map.remove(id);
+        }
     }
 
     public interface Requirement<META extends ComponentMetaclass<DATA, ?>, DATA> {
