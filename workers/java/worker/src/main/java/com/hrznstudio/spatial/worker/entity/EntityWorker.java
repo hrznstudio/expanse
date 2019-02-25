@@ -31,8 +31,8 @@ public class EntityWorker extends BaseWorker.BaseViewWorker {
 
     @Override
     protected void onConnected() {
-        getDispatcher().onAddComponent(PlayerConnection.COMPONENT, argument -> playerTimeout.put(argument.entityId, 10));
-        getDispatcher().onComponentUpdate(PlayerConnection.COMPONENT, argument -> playerTimeout.put(argument.entityId, 10));
+        getDispatcher().onAddComponent(PlayerConnection.COMPONENT, argument -> playerTimeout.put(argument.entityId, 5));
+        getDispatcher().onComponentUpdate(PlayerConnection.COMPONENT, argument -> playerTimeout.put(argument.entityId, 5));
         getDispatcher().onAuthorityChange(WorldEntity.COMPONENT, argument -> {
             if (argument.authority == Authority.AUTHORITATIVE) {
                 playerTimeout.put(argument.entityId, 5);
