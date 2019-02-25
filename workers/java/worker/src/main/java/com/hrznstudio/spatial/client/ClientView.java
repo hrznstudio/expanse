@@ -20,12 +20,15 @@ import improbable.worker.Entity;
 import improbable.worker.EntityId;
 import improbable.worker.View;
 import minecraft.entity.*;
+import minecraft.player.*;
 import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.EntityTracker;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class WorldConverter {
-    private static int worldSize = 512;
+    private static int worldSize = 128;
     private static final String CHUNK = "chunk";
     private static final WorkerRequirementSet CHUNK_REQUIREMENT_SET = new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("chunk_worker"))));
 

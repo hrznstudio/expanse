@@ -1,6 +1,7 @@
 package com.hrznstudio.spatial.worker;
 
 import com.hrznstudio.spatial.util.ConnectionManager;
+import improbable.worker.Connection;
 import improbable.worker.Dispatcher;
 import improbable.worker.Ops;
 import improbable.worker.View;
@@ -92,6 +93,9 @@ abstract public class BaseWorker<D extends Dispatcher> implements WorkerService 
     @Nullable
     public D getDispatcher() {
         return dispatcher;
+    }
+    public Connection getConnection() {
+        return ConnectionManager.getConnection();
     }
 
     /**

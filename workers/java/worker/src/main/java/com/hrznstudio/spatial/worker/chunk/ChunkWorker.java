@@ -13,6 +13,7 @@ import minecraft.world.Block;
 import minecraft.world.ChunkStorage;
 import minecraft.world.ChunkStorageData;
 import minecraft.world.State;
+import net.minecraft.init.Bootstrap;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -23,6 +24,10 @@ public final class ChunkWorker extends BaseWorker.BaseViewWorker {
     private static final Block block = new Block("minecraft:stone");
     private static final WorkerRequirementSet CHUNK_REQUIREMENT_SET = new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("chunk_worker"))));
     private final Map<Integer, State> tmpChunk;
+
+    public ChunkWorker() {
+        Bootstrap.register();
+    }
 
     {
         tmpChunk = new LinkedHashMap<>();

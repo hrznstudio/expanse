@@ -2,11 +2,10 @@ package com.hrznstudio.spatial.mixin;
 
 import com.hrznstudio.spatial.api.ISpatialEntity;
 import com.hrznstudio.spatial.util.ConnectionManager;
-import improbable.Coordinates;
-import improbable.Position;
 import improbable.Vector3f;
 import improbable.worker.EntityId;
-import minecraft.entity.*;
+import minecraft.entity.Rotation;
+import minecraft.player.PlayerInput;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.spongepowered.asm.mixin.Mixin;

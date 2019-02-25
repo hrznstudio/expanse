@@ -8,9 +8,10 @@ import improbable.Vector3f;
 import improbable.collections.Option;
 import improbable.worker.Authority;
 import improbable.worker.EntityId;
-import minecraft.entity.PlayerConnection;
-import minecraft.entity.PlayerInput;
 import minecraft.entity.WorldEntity;
+import minecraft.player.PlayerConnection;
+import minecraft.player.PlayerInput;
+import net.minecraft.init.Bootstrap;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +23,11 @@ import java.util.concurrent.TimeUnit;
 public class EntityWorker extends BaseWorker.BaseViewWorker {
 
     public static Map<EntityId, Integer> playerTimeout = new HashMap<>();
-    private ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
+    private final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
+
+    public EntityWorker() {
+        Bootstrap.register();
+    }
 
     @Override
     protected void onConnected() {

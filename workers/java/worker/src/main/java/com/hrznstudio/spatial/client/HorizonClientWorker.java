@@ -10,6 +10,7 @@ import improbable.*;
 import improbable.collections.Option;
 import improbable.worker.*;
 import minecraft.entity.*;
+import minecraft.player.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -136,7 +137,7 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
                     false,
                     0,
                     EnumDifficulty.NORMAL,
-                    9001,
+                    1000,
                     WorldType.FLAT,
                     false
             ));
@@ -151,5 +152,13 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
         super.onDisConnected(reason);
         WorldClient wc = Minecraft.getMinecraft().world;
         if (wc != null) wc.sendQuittingDisconnectingPacket();
+    }
+
+    public NetHandlerPlayClient getNetHandlerPlayClient() {
+        return netHandlerPlayClient;
+    }
+
+    public NetworkManager getNetworkManager() {
+        return networkManager;
     }
 }

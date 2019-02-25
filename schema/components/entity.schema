@@ -36,32 +36,6 @@ component WorldEntity {
   id= 1010;
 }
 
-type GameProfile {
-  string uuid = 1;
-  string name = 2;
-}
-
-component PlayerInfo {
-  id = 1006;
-  GameProfile profile = 1;
-}
-
-component PlayerInput {
-  id = 1011;
-  improbable.Vector3f move_position = 1;
-  bool sprinting = 2;
-  bool sneaking = 3;
-}
-
-type Heartbeat {
-
-}
-
-component PlayerConnection {
-  id = 1009;
-  event Heartbeat heartbeat;
-}
-
 component ChatAbility {
   id = 1007;
 }
