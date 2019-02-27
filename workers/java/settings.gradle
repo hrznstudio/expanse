@@ -3,4 +3,4 @@ include 'worker-sdk'
 include 'worker:patcherdummy'
 
 rootProject.name = "HorizonJavaWorker"
-gradle.ext.mainClass = 'com.hrznstudio.spatial.SpatialLaunchWrapper'
+gradle.ext.mainClass = 'com.hrznstudio.spatial.launch.SpatialLaunchWrapper'

@@ -1,8 +1,8 @@
 {
     "name": "spatial",
     "project_version": "0.0.1",
-    "sdk_version": "13.5.0",
+    "sdk_version": "13.6.1",
     "dependencies": [
-        {"name": "standard_library", "version": "13.5.0"}
+        {"name": "standard_library", "version": "13.6.1"}
     ]
 }
