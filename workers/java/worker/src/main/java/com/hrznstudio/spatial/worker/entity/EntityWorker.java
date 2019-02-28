@@ -8,6 +8,7 @@ import improbable.Vector3f;
 import improbable.collections.Option;
 import improbable.worker.Authority;
 import improbable.worker.EntityId;
+import minecraft.entity.Motion;
 import minecraft.entity.WorldEntity;
 import minecraft.player.PlayerConnection;
 import minecraft.player.PlayerInput;
@@ -54,6 +55,21 @@ public class EntityWorker extends BaseWorker.BaseViewWorker {
                                                     pos.getX(), //TODO: Put some checks in here to make sure this position isn't speed hack
                                                     pos.getY(),
                                                     pos.getZ()
+                                            )
+                                    )
+                    );
+                }
+                Vector3f motion = argument.update.getDesiredMotion().orElse(null);
+                if (motion != null) {
+                    ConnectionManager.getConnection().sendComponentUpdate(
+                            Motion.COMPONENT,
+                            argument.entityId,
+                            new Motion.Update()
+                                    .setMotion(
+                                            new Vector3f(
+                                                    motion.getX(), //TODO: Put some checks in here to make sure this motion isn't speed hack
+                                                    motion.getY(),
+                                                    motion.getZ()
                                             )
                                     )
                     );

@@ -23,8 +23,9 @@ component MapRepresentation {
 component PlayerInput {
   id = 1451;
   improbable.Vector3f move_position = 1;
-  bool sprinting = 2;
-  bool sneaking = 3;
+  improbable.Vector3f desired_motion = 2;
+  bool sprinting = 3;
+  bool sneaking = 4;
 }
 
 type Heartbeat {

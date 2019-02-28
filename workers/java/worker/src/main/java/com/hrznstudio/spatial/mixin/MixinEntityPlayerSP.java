@@ -43,7 +43,6 @@ public abstract class MixinEntityPlayerSP {
     @Redirect(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;onUpdateWalkingPlayer()V"))
     public void onUpdateWalkingPlayer(EntityPlayerSP playerSP) {
         if (ConnectionManager.getConnectionStatus().isConnected()) {
-            boolean flag = playerSP.isSprinting();
             EntityId id = ((ISpatialEntity) playerSP).getSpatialId();
             if (id == null) {
                 return;
@@ -51,27 +50,26 @@ public abstract class MixinEntityPlayerSP {
 
             PlayerInput.Update update = new PlayerInput.Update();
 
-            if (flag != serverSprintState) {
-                update.setSprinting(flag);
-                serverSprintState = flag;
+            boolean sprinting = playerSP.isSprinting();
+            boolean sneaking = playerSP.isSneaking();
+
+            if (sprinting != serverSprintState) {
+                update.setSprinting(sprinting);
+                serverSprintState = sprinting;
             }
 
-            boolean flag2 = playerSP.isSneaking();
-
-            if (flag2 != serverSneakState) {
-                update.setSneaking(flag2);
-                serverSneakState = flag2;
+            if (sneaking != serverSneakState) {
+                update.setSneaking(sneaking);
+                serverSneakState = sneaking;
             }
 
             ++this.positionUpdateTicks;
             AxisAlignedBB axisalignedbb = playerSP.getEntityBoundingBox();
-            double d0 = playerSP.posX - this.lastReportedPosX;
-            double d1 = axisalignedbb.minY - this.lastReportedPosY;
-            double d2 = playerSP.posZ - this.lastReportedPosZ;
-            double d3 = (double) (playerSP.rotationYaw - this.lastReportedYaw);
-            double d4 = (double) (playerSP.rotationPitch - this.lastReportedPitch);
-            boolean pos = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D;
-            boolean rot = d3 != 0.0D || d4 != 0.0D;
+            double xChange = playerSP.posX - this.lastReportedPosX;
+            double yChange = axisalignedbb.minY - this.lastReportedPosY;
+            double zChange = playerSP.posZ - this.lastReportedPosZ;
+            boolean pos = xChange * xChange + yChange * yChange + zChange * zChange > 9.0E-4D;
+            boolean rot = (playerSP.rotationYaw - this.lastReportedYaw) != 0.0D || (playerSP.rotationPitch - this.lastReportedPitch) != 0.0D;
 
             if (pos) {
                 update.setMovePosition(new Vector3f((float) playerSP.posX, (float) playerSP.posY, (float) playerSP.posZ));
@@ -80,6 +78,7 @@ public abstract class MixinEntityPlayerSP {
                 this.lastReportedPosZ = playerSP.posZ;
                 this.positionUpdateTicks = 0;
             }
+            update.setDesiredMotion(new Vector3f((float) playerSP.motionX, (float) playerSP.motionY, (float) playerSP.motionZ));
 
             if (rot) {
                 ConnectionManager.getConnection().sendComponentUpdate(Rotation.COMPONENT, id, new Rotation.Update().setPitch(playerSP.rotationPitch).setYaw(playerSP.rotationYaw));

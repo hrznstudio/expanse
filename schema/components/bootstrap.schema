@@ -1,6 +1,8 @@
 package minecraft.boostrap;
 
 import "components/player.schema";
+import "components/general.schema";
+import "components/world.schema";
 
 // Reserves 1400-1449
 
@@ -14,5 +16,7 @@ type Message {
 component Bootstrap {
   id = 1400;
   map<string, minecraft.player.GameProfile> online_players = 1;
-  command Message on_chat(Message);
+  map<uint32, minecraft.world.State> state_registry = 2;
+  command minecraft.general.Void on_chat(Message);
+  event Message on_message;
 }

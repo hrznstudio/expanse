@@ -90,7 +90,7 @@ public final class HorizonClientWorker extends BaseWorker<ClientView> {
                 );
                 builder.addComponent(
                         PlayerInput.COMPONENT,
-                        new PlayerInputData(new Vector3f(0, 0, 0), false, false
+                        new PlayerInputData(new Vector3f(0, 0, 0),new Vector3f(0, 0, 0), false, false
                         ),
                         new WorkerRequirementSet(Collections.singletonList(new WorkerAttributeSet(Collections.singletonList("workerId:" + this.getName()))))
                 );

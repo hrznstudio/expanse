@@ -3,6 +3,7 @@ package com.hrznstudio.spatial.worker.bootstrap;
 import com.hrznstudio.spatial.worker.BaseWorker;
 import minecraft.boostrap.Bootstrap;
 import minecraft.boostrap.Message;
+import minecraft.general.Void;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
@@ -21,7 +22,7 @@ public class Bootstrapper extends BaseWorker.BaseViewWorker {
             if (!MinecraftForge.EVENT_BUS.post(event)) {
                 Message responseMessage = Message.create();
                 responseMessage.setMessage(event.getComponent().getFormattedText());
-                getConnection().sendCommandResponse(Bootstrap.Commands.ON_CHAT, argument.requestId, responseMessage);
+                getConnection().sendCommandResponse(Bootstrap.Commands.ON_CHAT, argument.requestId, Void.create());
             }
         });
     }
