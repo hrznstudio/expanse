@@ -10,9 +10,11 @@ import improbable.worker.Authority;
 import improbable.worker.EntityId;
 import minecraft.entity.Motion;
 import minecraft.entity.WorldEntity;
+import minecraft.general.Void;
 import minecraft.player.PlayerConnection;
 import minecraft.player.PlayerInput;
 import net.minecraft.init.Bootstrap;
+import net.minecraft.util.EnumHand;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +42,11 @@ public class EntityWorker extends BaseWorker.BaseViewWorker {
             } else if (argument.authority == Authority.NOT_AUTHORITATIVE) {
                 playerTimeout.remove(argument.entityId);
             }
+        });
+
+        getDispatcher().onCommandRequest(PlayerInput.Commands.ITEM_RIGHTCLICK, argument -> {
+            System.out.println("Received right click with hand " + (argument.request.getMain() ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND).name());
+            getConnection().sendCommandResponse(PlayerInput.Commands.ITEM_RIGHTCLICK, argument.requestId, Void.create());
         });
 
         getDispatcher().onComponentUpdate(PlayerInput.COMPONENT, argument -> {
@@ -78,7 +85,7 @@ public class EntityWorker extends BaseWorker.BaseViewWorker {
         });
 
         service.scheduleAtFixedRate(() -> {
-            if(!playerTimeout.isEmpty()) {
+            if (!playerTimeout.isEmpty()) {
                 new HashSet<>(playerTimeout.keySet()).forEach(id -> {
                     int i = playerTimeout.get(id);
                     if (i == 0) {

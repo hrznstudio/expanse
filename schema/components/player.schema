@@ -1,6 +1,7 @@
 package minecraft.player;
 
 import "improbable/vector3.schema";
+import "components/general.schema";
 
 // Reserves 1450-1499
 
@@ -20,12 +21,17 @@ component MapRepresentation {
   string icon = 2;
 }
 
+type Hand {
+  bool main = 1;
+}
+
 component PlayerInput {
   id = 1451;
   improbable.Vector3f move_position = 1;
   improbable.Vector3f desired_motion = 2;
   bool sprinting = 3;
   bool sneaking = 4;
+  command minecraft.general.Void item_rightclick(Hand);
 }
 
 type Heartbeat {

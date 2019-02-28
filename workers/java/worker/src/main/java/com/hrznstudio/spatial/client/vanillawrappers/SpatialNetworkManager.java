@@ -1,11 +1,18 @@
 package com.hrznstudio.spatial.client.vanillawrappers;
 
+import com.hrznstudio.spatial.SpatialMod;
 import com.hrznstudio.spatial.client.HorizonClientWorker;
+import com.hrznstudio.spatial.util.ConnectionManager;
+import improbable.collections.Option;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import minecraft.player.Hand;
+import minecraft.player.PlayerInput;
 import net.minecraft.network.*;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.ITextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,7 +61,13 @@ public class SpatialNetworkManager extends NetworkManager {
 
     @Override
     public void sendPacket(Packet<?> packetIn) {
-        logger.info(() -> "SpatialNetworkManager#sendPacket not implemented (received " + packetIn.getClass() + ")");
+        if (packetIn instanceof CPacketPlayerTryUseItem) {
+            Hand hand = Hand.create();
+            hand.setMain(((CPacketPlayerTryUseItem) packetIn).getHand() == EnumHand.MAIN_HAND);
+            ConnectionManager.getConnection().sendCommandRequest(PlayerInput.Commands.ITEM_RIGHTCLICK, SpatialMod.getClientWorker().getPlayerId(), hand, Option.empty());
+        } else {
+            logger.info(() -> "SpatialNetworkManager#sendPacket not implemented for received packet (" + packetIn.getClass() + ")");
+        }
     }
 
     @Override
