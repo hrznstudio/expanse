@@ -3,6 +3,7 @@
 # Horizon Expanse
 
 [![Discord](https://img.shields.io/discord/422424112863117312.svg?style=for-the-badge&logo=discord)](https://discord.gg/758eCD7)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FHRZNStudio%2FExpanse.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FHRZNStudio%2FExpanse?ref=badge_shield)
 [![](https://img.shields.io/github/contributors/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/graphs/contributors)
 [![](https://img.shields.io/github/issues/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/issues)
 [![](https://img.shields.io/github/issues-pr/HRZNStudio/Expanse.svg?style=for-the-badge&logo=github)](https://github.com/HRZNStudio/Expanse/pulls)
@@ -45,3 +46,7 @@ SpatialOS works differently: it brings together many servers so they’re workin
 > Any missing information will be found [here](https://docs.improbable.io/reference/13.5/shared/build)
 
 run `spatial worker build` to set up the worker SDKs
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FHRZNStudio%2FExpanse.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FHRZNStudio%2FExpanse?ref=badge_large)
